@@ -1,0 +1,22 @@
+{
+  "name": "o2",
+  "version": "1.0.0",
+  "description": "Team O2's entry for the RBC Hackathon",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xtangle/O2.git"
+  },
+  "author": "O2 Team",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xtangle/O2/issues"
+  },
+  "homepage": "https://github.com/xtangle/O2#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
