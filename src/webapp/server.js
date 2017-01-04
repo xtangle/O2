@@ -1,13 +1,18 @@
 var express = require('express');
 var path = require('path');
+// cfenv provides access to your Cloud Foundry environment, for info see: https://www.npmjs.com/package/cfenv
+var cfenv = require('cfenv');
+
 var app = express();
 
-// first parameter is the mount point, second is the location in the file system
-app.use("/public", express.static(path.resolve(__dirname, 'public')));
+// serve the files out of ./public as our main files
+app.use(express.static(path.resolve(__dirname, 'public')));
 
-// viewed at http://localhost:8080
-app.get('/', function(req, res) {
-  res.sendFile(path.resolve(__dirname, 'public/index.html'));
+// get the app environment from Cloud Foundry
+var appEnv = cfenv.getAppEnv();
+
+// start server on the specified port and binding host
+app.listen(appEnv.port, '0.0.0.0', function() {
+  // print a message when the server starts listening
+  console.log("server starting on " + appEnv.url);
 });
-
-app.listen(8080);

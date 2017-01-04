@@ -2,9 +2,9 @@
   "name": "o2",
   "version": "1.0.0",
   "description": "Team O2's entry for the RBC Hackathon",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/webapp/server.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,10 @@
   },
   "homepage": "https://github.com/xtangle/O2#readme",
   "dependencies": {
-    "express": "^4.14.0"
+    "express": "^4.14.0",
+    "cfenv": "^1.0.3"
+  },
+  "engines": {
+    "node": "6.9.2"
   }
 }
