@@ -7,9 +7,6 @@ var app = express();
 
 app.enable('trust proxy');
 
-// serve the files out of ./public as our main files
-app.use(express.static(path.resolve(__dirname, 'public')));
-
 // Add a handler to inspect the req.secure flag (see http://expressjs.com/api#req.secure).
 // This allows us to know whether the request was via http or https.
 app.use (function (req, res, next) {
@@ -21,6 +18,9 @@ app.use (function (req, res, next) {
     res.redirect('https://' + req.headers.host + req.url);
   }
 });
+
+// serve the files out of ./public as our main files
+app.use(express.static(path.resolve(__dirname, 'public')));
 
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
