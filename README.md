@@ -3,8 +3,8 @@ Repository for team O2's entry in the RBC Hackathon
 
 ## Installation
 1. Install Node.js https://nodejs.org/en/download/ and add the installation path to your PATH environment variable.
-1. Clone this project to a local directory.
-2. Navigate to the project root directory and run `npm install` on the command line.
+2. Clone this project to a local directory.
+3. Navigate to the project root directory and run `npm install` on the command line.
 
 ## Starting the web server
 1. At the project root directory, run `npm start`.
