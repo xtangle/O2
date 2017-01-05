@@ -24,11 +24,11 @@ var transactionSchema = new mongoose.Schema({
   Transaction_Type: String,
   Location_Code: String,
   Trade_Source_Code: String,
-  Trade_Date_and_Time: Date,
-  Received_Date_and_Time: Date,
-  Contractual_Settlement_Date_and_Time: Date,
-  Actual_Settlement_Date_and_Time: Date,
-  Maturity_Date_and_Time: Date,
+  Trade_Date_and_Time: String, // Timestamp
+  Received_Date_and_Time: String, // Timestamp
+  Contractual_Settlement_Date_and_Time: String, // Timestamp
+  Actual_Settlement_Date_and_Time: String, // Timestamp
+  Maturity_Date_and_Time: String, // Timestamp
   Settlement_Currency: String,
   Quantity: Number,
   Deal_Price: Number,
@@ -42,9 +42,9 @@ var transactionSchema = new mongoose.Schema({
   Book_Value: Number,
   Par_Value: Number,
   Transaction_Status: String,
-  Transaction_Status_Date_and_Time: Date,
+  Transaction_Status_Date_and_Time: String, // Timestamp
   Affirmation_Status: String,
-  Affirmation_Status_Date_and_Time: Date,
+  Affirmation_Status_Date_and_Time: String, // Timestamp
   STE_Indicator: String,
   STP_Indicator: String,
   STE_Code: String,
