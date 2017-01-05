@@ -22,7 +22,7 @@
   // The `zoom` and `drag` plugins enable
   // manipulating the globe with the mouse.
   globe.loadPlugin(planetaryjs.plugins.zoom({
-    scaleExtent: [100, 300]
+    scaleExtent: [300, 900]
   }));
   globe.loadPlugin(planetaryjs.plugins.drag({
     // Dragging the globe should pause the
@@ -35,7 +35,7 @@
     }
   }));
   // Set up the globe's initial scale, offset, and rotation.
-  globe.projection.scale(175).translate([175, 175]).rotate([0, -10, 0]);
+  globe.projection.scale(300).translate([300, 300]).rotate([0, -10, 0]);
 
   // Every few hundred milliseconds, we'll draw another random ping.
   var colors = ['red', 'yellow', 'white', 'orange', 'green', 'cyan', 'pink'];
@@ -49,11 +49,11 @@
   var canvas = document.getElementById('rotatingGlobe');
   // Special code to handle high-density displays (e.g. retina, some phones)
   // In the future, Planetary.js will handle this by itself (or via a plugin).
-  if (window.devicePixelRatio == 2) {
-    canvas.width = 800;
-    canvas.height = 800;
+  if (window.devicePixelRatio == 10) {
+    canvas.width = 100;
+    canvas.height = 100;
     context = canvas.getContext('2d');
-    context.scale(2, 2);
+    context.scale(3, 3);
   }
   // Draw that globe!
   globe.draw(canvas);
