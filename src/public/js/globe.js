@@ -28,8 +28,8 @@ var countryTooltip = d3.select('body').append('div').attr('class', 'countryToolt
 var countryList = d3.select('body').append('select').attr('name', 'countries');
 
 queue()
-  .defer(d3.json, 'js/globe/world-110m.json')
-  .defer(d3.tsv, 'js/globe/world-110m-country-names.tsv')
+  .defer(d3.json, 'data/world-110m.json')
+  .defer(d3.tsv, 'data/world-110m-country-names.tsv')
   .await(ready);
 
 // Main function
