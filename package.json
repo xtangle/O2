@@ -4,7 +4,7 @@
   "description": "Team O2's entry for the RBC Hackathon",
   "private": true,
   "scripts": {
-    "start": "node src/web-server.js"
+    "start": "node src/server.js"
   },
   "repository": {
     "type": "git",
@@ -17,8 +17,9 @@
   },
   "homepage": "https://github.com/xtangle/O2#readme",
   "dependencies": {
+    "cfenv": "^1.0.3",
     "express": "^4.14.0",
-    "cfenv": "^1.0.3"
+    "mongoose": "^4.7.6"
   },
   "engines": {
     "node": "6.9.2"
