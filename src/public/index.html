@@ -4,16 +4,12 @@
   <meta charset="UTF-8">
   <title>Cash Tracker Demo</title>
 
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-  <style>
-    body {
-      padding-top: 50px;
-    }
-  </style>
+  <link rel='stylesheet' href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css'>
+  <link rel='stylesheet' href='css/globe.css'>
 
   <script type='text/javascript' src='//d3js.org/d3.v3.min.js'></script>
   <script type='text/javascript' src='//d3js.org/topojson.v1.min.js'></script>
-  <script type='text/javascript' src='planetaryjs/planetaryjs.min.js'></script>
+  <script type='text/javascript' src='//d3js.org/queue.v1.min.js'></script>
 </head>
 <body>
 
@@ -22,10 +18,7 @@
       <h1>Hello World</h1>
     </div>
   </div>
-  <div style='text-align: center'>
-    <canvas id='rotatingGlobe' width='400' height='400' style='width: 400px; height: 400px; cursor: move;'></canvas>
-  </div>
 
-  <script type='text/javascript' src='globe.js'></script>
+  <script type='text/javascript' src='js/globe/globe.js'></script>
 </body>
 </html>
