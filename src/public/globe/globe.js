@@ -302,11 +302,13 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
 
 function getCookieValue(cookieName) {
   var cookieValue = null;
-  document.cookie.split(';').forEach(function (cookie) {
+  document.cookie.split(';').some(function (cookie) {
     var a = cookie.split('=');
     if (a[0].trim() === cookieName) {
       cookieValue = a[1].trim();
+      return true;
     }
+    return false;
   });
   return cookieValue;
 }
