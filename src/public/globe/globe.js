@@ -17,7 +17,7 @@ socket.on('connect', function () {
   });
 });
 
-// Cash balance data
+// Cash balance parameters
 const base_currency = 'USD';
 const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 100000, cash_excess = 1000000;
 
@@ -79,7 +79,7 @@ function ready(error, world, countryCurrencyData, conversionRates) {
     countryNames[d.id] = d.name;
     currencyNames[d.id] = d.currency_name;
     currencyCodes[d.id] = d.currency_code;
-    currencySymbols[d.id] = d.currency_symbol_dec;
+    currencySymbols[d.id] = d.currency_symbol;
 
     var option = countryList.append('option');
     option.text(d.name);
@@ -88,11 +88,8 @@ function ready(error, world, countryCurrencyData, conversionRates) {
 
   // Initialize cash balances (for testing)
   (function initializeCashBalances() {
-    var hasValue = function (val) {
-      return function (obj) { return obj.indexOf(val) !== -1; };
-    };
-    function indexOf(obj, val) {
-      return _.findKey(obj, hasValue(val));
+    function indexOf(obj, value) {
+      return _.findKey(obj, function (v) { return v === value; });
     }
     cashBalances[indexOf(countryNames, 'Canada')] = 80000;
     cashBalances[indexOf(countryNames, 'India')] = -800;
