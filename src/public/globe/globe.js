@@ -18,7 +18,7 @@ socket.on('connect', function () {
 });
 
 // Cash balance parameters
-const base_currency_code = 'USD', base_currency_symbol = '$';
+const base_currency_code = 'EUR', base_currency_symbol = '€';
 const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 100000, cash_excess = 1000000;
 
 // Globe parameters
