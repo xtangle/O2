@@ -78,7 +78,9 @@ function ready(error, world, countryData) {
   svg.selectAll('path.land')
     // Mouse events
     .on('mouseover', function(d) {
-      countryTooltip.text(countryNames[d.id])
+      var cashBalance = cashBalances[countryNames[d.id]];
+      countryTooltip.text(countryNames[d.id] + ((cashBalance !== undefined && cashBalance !== null) ?
+          '\nAmount: ' + formatCurrencyString(cashBalance) : ''))
         .style('left', (d3.event.pageX + 7) + 'px')
         .style('top', (d3.event.pageY - 15) + 'px')
         .style('display', 'block')
@@ -100,8 +102,9 @@ function ready(error, world, countryData) {
     .attr('class', 'lake')
     .attr('d', path);
 
-  // Drag event
+  // Globe events
   svg.selectAll('path')
+    // Drag event
     .call(d3.behavior.drag()
       .origin(function() {
         var r = projection.rotate();
@@ -114,6 +117,7 @@ function ready(error, world, countryData) {
         svg.selectAll('path.lake').attr('d', path);
         svg.selectAll('.focused').classed('focused', focused = false);
       }))
+    // Zoom event
     .call(d3.behavior.zoom()
       .scale(projection.scale())
       .scaleExtent([scale_min, scale_max])
@@ -192,6 +196,13 @@ function ready(error, world, countryData) {
       b = Math.floor(255 * f);
     }
     return {r: r, g: g, b: b};
+  }
+
+  function formatCurrencyString(cashBalance) {
+    if (cashBalance === undefined || cashBalance === null) {
+      return '';
+    }
+    return (cashBalance < 0 ? '-' : '') + '$' + cashBalance;
   }
 
 }

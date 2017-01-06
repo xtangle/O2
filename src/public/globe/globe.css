@@ -48,4 +48,5 @@ select {
   color: #666;
   font-size: 14px;
   font-family: sans-serif;
+  white-space: pre-wrap;
 }
