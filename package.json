@@ -4,7 +4,7 @@
   "description": "Team O2's entry for the RBC Hackathon",
   "private": true,
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
