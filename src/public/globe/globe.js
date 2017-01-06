@@ -14,7 +14,7 @@ var path = d3.geo.path()
   .projection(projection);
 
 // SVG container
-var svg = d3.select('body').append('svg')
+var svg = d3.select('#globe')
   .attr('width', width)
   .attr('height', height);
 
@@ -47,24 +47,11 @@ function ready(error, world, countryData) {
   });
 
   // Drawing countries on the globe
-  var world = svg.selectAll('path.land')
+  svg.selectAll('path.land')
     .data(countries)
     .enter().append('path')
     .attr('class', 'land')
     .attr('d', path)
-
-    // Drag event
-    .call(d3.behavior.drag()
-      .origin(function() {
-        var r = projection.rotate();
-        return {x: r[0] / sens, y: -r[1] / sens};
-      })
-      .on('drag', function() {
-        var rotate = projection.rotate();
-        projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
-        svg.selectAll('path.land').attr('d', path);
-        svg.selectAll('.focused').classed('focused', focused = false);
-      }))
 
     // Mouse events
     .on('mouseover', function(d) {
@@ -82,6 +69,20 @@ function ready(error, world, countryData) {
       countryTooltip.style('left', (d3.event.pageX + 7) + 'px')
         .style('top', (d3.event.pageY - 15) + 'px');
     });
+
+  svg.selectAll('path')
+    // Drag event
+    .call(d3.behavior.drag()
+      .origin(function() {
+        var r = projection.rotate();
+        return {x: r[0] / sens, y: -r[1] / sens};
+      })
+      .on('drag', function() {
+        var rotate = projection.rotate();
+        projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
+        svg.selectAll('path.land').attr('d', path);
+        svg.selectAll('.focused').classed('focused', focused = false);
+      }));
 
   // Country focus on option select
   d3.select('select').on('change', function() {
