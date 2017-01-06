@@ -3,18 +3,25 @@
 }
 
 .water {
-  fill: #00248F;
+  fill: #22448F;
+  fill-opacity: 1;
+}
+
+.lake {
+  fill: #22448F;
+  fill-opacity: 1;
+  stroke: #FFF;
+  stroke-width: 0.5px;
 }
 
 .land {
-  fill: #A98B6F;
+  fill: #AAAAAA;
   stroke: #FFF;
-  stroke-width: 0.7px;
+  stroke-width: 0.5px;
 }
 
 .land:hover {
-  fill:#33CC33;
-  stroke-width: 1px;
+  stroke-width: 1.2px;
 }
 
 .focused {

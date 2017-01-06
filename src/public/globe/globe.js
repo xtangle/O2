@@ -28,7 +28,7 @@ var countryTooltip = d3.select('body').append('div').attr('class', 'countryToolt
 var countryList = d3.select('body').append('select').attr('name', 'countries');
 
 queue()
-  .defer(d3.json, 'globe/world-110m.json')
+  .defer(d3.json, 'globe/world-110m-withlakes.json')
   .defer(d3.tsv, 'globe/world-110m-country-names.tsv')
   .await(ready);
 
@@ -37,6 +37,7 @@ function ready(error, world, countryData) {
 
   var countryById = {};
   var countries = topojson.feature(world, world.objects.countries).features;
+  var lakes = topojson.feature(world, world.objects.ne_110m_lakes).features;
 
   // Adding countries to select
   countryData.forEach(function(d) {
@@ -70,8 +71,15 @@ function ready(error, world, countryData) {
         .style('top', (d3.event.pageY - 15) + 'px');
     });
 
+  // Drawing lakes on the globe
+  svg.selectAll('path.lake')
+    .data(lakes)
+    .enter().append('path')
+    .attr('class', 'lake')
+    .attr('d', path);
+
+  // Drag event
   svg.selectAll('path')
-    // Drag event
     .call(d3.behavior.drag()
       .origin(function() {
         var r = projection.rotate();
@@ -81,6 +89,7 @@ function ready(error, world, countryData) {
         var rotate = projection.rotate();
         projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
         svg.selectAll('path.land').attr('d', path);
+        svg.selectAll('path.lake').attr('d', path);
         svg.selectAll('.focused').classed('focused', focused = false);
       }));
 
