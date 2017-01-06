@@ -19,6 +19,7 @@ socket.on('connect', function () {
 
 // Cash balance parameters
 const base_currency_code = 'EUR', base_currency_symbol = '€';
+const conversion_rate_resource_url = '//api.fixer.io/latest?base=' + base_currency_code;
 const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 100000, cash_excess = 1000000;
 
 // Globe parameters
@@ -56,7 +57,7 @@ var countryList = d3.select('body').append('select').attr('name', 'countries');
 queue()
   .defer(d3.json, 'globe/world-110m-withlakes.json')
   .defer(d3.tsv, 'globe/world-110m-country-currency-data.tsv')
-  .defer(d3.json, '//api.fixer.io/latest?base=' + base_currency_code)
+  .defer(d3.json, conversion_rate_resource_url)
   .await(ready);
 
 // Main function
@@ -213,13 +214,18 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
     }
   }
 
-  // Below are helper functions
+  // Set an interval to retrieve the latest conversion rates
+  (function getConversionRates() {
+    setTimeout(function () {
+      d3.json(conversion_rate_resource_url, function (data) {
+        conversionRatesData = data;
+        conversionRates = conversionRatesData.rates;
+        getConversionRates();
+      });
+    }, 10000);
+  })();
 
-  function indexOf(obj, value) {
-    return _.findKey(obj, function (v) {
-      return v === value;
-    });
-  }
+  // Below are some helper functions
 
   function indicesOf(obj, value) {
     return _.keys(obj).filter(function (k) {
