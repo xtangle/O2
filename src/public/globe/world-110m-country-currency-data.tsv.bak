@@ -1,0 +1,175 @@
+﻿id	name	currency_name	currency_code	currency_symbol
+4	Afghanistan
+8	Albania
+12	Algeria
+24	Angola
+10	Antarctica
+32	Argentina	Argentine Peso	ARS	&#36;
+51	Armenia
+36	Australia	Australian Dollars	AUD	&#36;
+40	Austria	Euro	EUR	&#8364;
+31	Azerbaijan
+44	Bahamas	Bahamian Dollar	BSD	&#36;
+50	Bangladesh
+112	Belarus
+56	Belgium	Euro	EUR	&#8364;
+84	Belize
+204	Benin
+64	Bhutan
+68	Bolivia, Plurinational State of
+70	Bosnia and Herzegovina
+72	Botswana
+76	Brazil	Brazillian Real	BRL	R&#36;
+96	Brunei Darussalam
+100	Bulgaria
+854	Burkina Faso
+108	Burundi
+116	Cambodia
+120	Cameroon
+124	Canada	Canadian Dollar	CAD	&#36;
+140	Central African Republic
+148	Chad
+152	Chile	Chilean Peso	CLP	&#36;
+156	China	Yuan Renminbi	CNY	&#165;
+170	Colombia	Peso	COP	&#36;
+178	Congo
+180	Congo, the Democratic Republic of the
+188	Costa Rica	Costa Rican Colon	CRC	&#8353;
+384	Cote d'Ivoire
+191	Croatia	Croatian Kuna	HRK	kn
+192	Cuba	Cuban Peso	CUP	&#36;
+196	Cyprus
+203	Czech Republic	Koruna	CZK	Kčs
+208	Denmark	Danish Krone	DKK	kr
+262	Djibouti
+214	Dominican Republic
+218	Ecuador	United States Dollar	USD	&#36;
+818	Egypt	Egyptian Pound	EGP	&#163;
+222	El Salvador
+226	Equatorial Guinea
+232	Eritrea
+233	Estonia
+231	Ethiopia
+238	Falkland Islands (Malvinas)
+242	Fiji
+246	Finland	Euro	EUR	&#8364;
+250	France	Euro	EUR	&#8364;
+260	French Southern Territories
+266	Gabon
+270	Gambia
+268	Georgia
+276	Germany	Euro	EUR	&#8364;
+288	Ghana
+300	Greece	Euro	EUR	&#8364;
+304	Greenland
+320	Guatemala
+324	Guinea
+624	Guinea-Bissau
+328	Guyana
+332	Haiti
+340	Honduras	Honduran Lempira	HNL	L
+348	Hungary	Hungarian Forint	HUF	Ft
+352	Iceland
+356	India	Indian Rupee	INR	&#8377;
+360	Indonesia
+364	Iran, Islamic Republic of
+368	Iraq
+372	Ireland	Euro	EUR	&#8364;
+376	Israel
+380	Italy	Euro	EUR	&#8364;
+388	Jamaica	Jamaican Dollar	JMD	J&#36;
+392	Japan	Japanese Yen	JPY	&#165;
+400	Jordan
+398	Kazakhstan
+404	Kenya	Kenyan Shilling	KES	KSh
+408	Korea, Democratic People's Republic of	North Korean Won	KPW	&#8361;
+410	Korea, Republic of	South Korean Won	KRW	&#8361;
+414	Kuwait
+417	Kyrgyzstan
+418	Lao People's Democratic Republic
+428	Latvia	Euro	EUR	&#8364;
+422	Lebanon
+426	Lesotho
+430	Liberia
+434	Libya
+440	Lithuania	Euro	EUR	&#8364;
+442	Luxembourg	Euro	EUR	&#8364;
+807	Macedonia, the former Yugoslav Republic of
+450	Madagascar
+454	Malawi
+458	Malaysia	Malaysian Ringgit	MYR	RM
+466	Mali
+478	Mauritania
+484	Mexico	Mexican Peso	MXN	&#36;
+498	Moldova, Republic of
+496	Mongolia
+499	Montenegro	Euro	EUR	&#8364;
+504	Morocco	Moroccan Dirham	MAD	DH
+508	Mozambique
+104	Myanmar
+516	Namibia	Namibian Dollar	NAD	&#36;
+524	Nepal
+528	Netherlands	Euro	EUR	&#8364;
+540	New Caledonia
+554	New Zealand	New Zealand Dollar	NZD	&#36;
+558	Nicaragua	Nicaraguan Córdoba	NIO	C&#36;
+562	Niger
+566	Nigeria	Nigerian Naira	NGN	&#8358;
+578	Norway	Norwegian Krone	NOK	kr
+512	Oman
+586	Pakistan	Pakistani Rupee	PKR	Rs
+275	Palestinian Territory, Occupied
+591	Panama
+598	Papua New Guinea
+600	Paraguay	Paraguayan Guaraní	PYG	&#8370;
+604	Peru	Nuevo Sol	PEN	S/.
+608	Philippines	Philippine Peso	PHP	&#8369;
+616	Poland	Polish Złoty	PLN	z&#122;
+620	Portugal	Euro	EUR	&#8364;
+630	Puerto Rico	United States Dollar	USD	&#36;
+634	Qatar
+642	Romania	Romanian Leu	RON	lei
+643	Russian Federation	Russian Ruble	RUB	&#8381;
+646	Rwanda
+682	Saudi Arabia	Saudi Arabia Riyal	SAR	&#65020;
+686	Senegal
+688	Serbia	Serbian Dinar	RSD	РСД
+694	Sierra Leone
+703	Slovakia	Euro	EUR	&#8364;
+705	Slovenia	Euro	EUR	&#8364;
+90	Solomon Islands
+706	Somalia
+710	South Africa	South African Rand	ZAR	R
+728	South Sudan
+724	Spain	Euro	EUR	&#8364;
+144	Sri Lanka
+729	Sudan
+740	Suriname
+748	Swaziland
+752	Sweden	Swedish Krona	SEK	kr
+756	Switzerland	Swiss Franc	CHF	Fr
+760	Syrian Arab Republic
+158	Taiwan, Province of China
+762	Tajikistan
+834	Tanzania, United Republic of
+764	Thailand	Thai Baht	THB	&#3647;
+626	Timor-Leste
+768	Togo
+780	Trinidad and Tobago	Trinidad and Tobago Dollar	TTD	&#36;
+788	Tunisia
+792	Turkey
+795	Turkmenistan
+800	Uganda
+804	Ukraine	Ukrainian Hryvnia	UAH	&#8372;
+784	United Arab Emirates
+826	United Kingdom	Pound sterling	GBP	&#163;
+840	United States	United States Dollar	USD	&#36;
+858	Uruguay	Uruguayan Peso	UYU	&#36;
+860	Uzbekistan
+548	Vanuatu
+862	Venezuela, Bolivarian Republic of
+704	Viet Nam
+732	Western Sahara
+887	Yemen
+894	Zambia
+716	Zimbabwe

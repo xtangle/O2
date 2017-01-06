@@ -115,7 +115,12 @@ function ready(error, world, countryCurrencyData, conversionRates) {
     // Mouse events
     .on('mouseover', function(d) {
       var cashBalance = cashBalances[d.id];
-      countryTooltip.text(countryNames[d.id] + (_.isNil(cashBalance) ? '' : '\nAmount: ' + formatCurrencyString(cashBalance)))
+      var currencySymbol = currencySymbols[d.id];
+      var currencyName = currencyNames[d.id];
+      var currencyCode = currencyCodes[d.id];
+      countryTooltip.text(countryNames[d.id] +
+        (_.isNil(cashBalance) || _.isNil(currencySymbol) ? '' : '\nAmount: ' + formatCurrencyString(cashBalance, currencySymbol)) +
+        (_.isNil(currencyName) || _.isNil(currencyCode) ? '' : '\nCurrency: ' + currencyName + ' (' + currencyCode + ')'))
         .style('left', (d3.event.pageX + 7) + 'px')
         .style('top', (d3.event.pageY - 15) + 'px')
         .style('display', 'block')
@@ -233,13 +238,11 @@ function ready(error, world, countryCurrencyData, conversionRates) {
     return {r: r, g: g, b: b};
   }
 
-  function formatCurrencyString(cashBalance) {
-    if (_.isNil(cashBalance)) {
-      return '';
-    } else if (cashBalance < 0) {
-      return '-' + '$' + (-cashBalance);
+  function formatCurrencyString(cashBalance, currencySymbol) {
+    if (cashBalance < 0) {
+      return '-' + currencySymbol + (-cashBalance);
     } else {
-      return '$' + cashBalance;
+      return currencySymbol + cashBalance;
     }
   }
 
