@@ -7,10 +7,10 @@
 
   <script type="text/javascript" src="lib/jquery.js"></script>
   <script type="text/javascript" src="lib/lodash.min.js"></script>
+  <script type='text/javascript' src='lib/socket.io.js'></script>
   <script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
   <script type="text/javascript" src="//d3js.org/topojson.v1.min.js"></script>
   <script type="text/javascript" src="//d3js.org/queue.v1.min.js"></script>
-  <script type='text/javascript' src='lib/socket.io.js'></script>
 
 </head>
 <body>
@@ -46,24 +46,4 @@
 
   <script type="text/javascript" src="globe/globe.js"></script>
 </body>
-<script>
-  //  var socket = io('https://websocket.btcchina.com/');
-  var socket = io('//localhost:6001');
-  socket.emit('subscribe', 'message-from-server');
-  socket.on('connect', function () {
-    socket.on('message-from-server', function (data) {
-      console.log(data);
-
-      // Update the Market Name
-      $('#transaction').text(data.transaction.transaction);
-
-      // Update the Buy price
-      $('#currency').text(data.transaction.currency);
-
-      // Update the Sell price
-      $('#amount').text(data.transaction.amount);
-
-    });
-  });
-</script>
 </html>

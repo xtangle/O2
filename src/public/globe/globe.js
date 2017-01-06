@@ -1,3 +1,21 @@
+// globe.js
+// Dependencies: jquery, lodash, socket.io, d3, d3.topojson, d3.queue
+
+// Socket.io
+var socket = io('//localhost:8080');
+socket.emit('subscribe', 'message-from-server');
+socket.on('connect', function () {
+  socket.on('message-from-server', function (data) {
+    console.log(data);
+    // Update the Market Name
+    $('#transaction').text(data.transaction.transaction);
+    // Update the Buy price
+    $('#currency').text(data.transaction.currency);
+    // Update the Sell price
+    $('#amount').text(data.transaction.amount);
+  });
+});
+
 // Cash balance data
 const base_currency = 'USD';
 const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 100000, cash_excess = 1000000;

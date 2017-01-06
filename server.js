@@ -5,6 +5,7 @@ var cfenv = require('cfenv');
 var connectionManager = require('./src/connection-manager');
 
 var app = express();
+var port = 8080;
 
 // initialize the database connection
 connectionManager.init();
@@ -46,7 +47,7 @@ io.on('connection', function(socket) {
 
 // start server on the specified port and binding host
 var appEnv = cfenv.getAppEnv();
-server.listen(appEnv.port, appEnv.bind, function() {
+server.listen(port, '0.0.0.0', function() {
   // print a message when the server starts listening
-  console.log("server starting on " + appEnv.url);
+  console.log("server starting on " + appEnv.bind + ':' + port);
 });
