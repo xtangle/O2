@@ -97,7 +97,8 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
     setCashBalancesForCurrency('CAD', 80000);
     setCashBalancesForCurrency('USD', 600000);
     setCashBalancesForCurrency('INR', -80000);
-    setCashBalancesForCurrency('EUR', 1000000);
+    setCashBalancesForCurrency('EUR', 12000000);
+    setCashBalancesForCurrency('GBP', 700000);
     setCashBalancesForCurrency('CNY', 0);
     setCashBalancesForCurrency('JPY', -50000);
   })();

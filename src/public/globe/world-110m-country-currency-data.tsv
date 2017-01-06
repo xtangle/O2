@@ -38,7 +38,7 @@
 384	Cote d'Ivoire
 191	Croatia	Croatian Kuna	HRK	kn
 192	Cuba	Cuban Peso	CUP	$
-196	Cyprus
+196	Cyprus	Euro	EUR	€
 203	Czech Republic	Koruna	CZK	Kčs
 208	Denmark	Danish Krone	DKK	kr
 262	Djibouti
@@ -48,7 +48,7 @@
 222	El Salvador
 226	Equatorial Guinea
 232	Eritrea
-233	Estonia
+233	Estonia	Euro	EUR	€
 231	Ethiopia
 238	Falkland Islands (Malvinas)
 242	Fiji
