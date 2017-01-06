@@ -91,6 +91,16 @@ function ready(error, world, countryData) {
         svg.selectAll('path.land').attr('d', path);
         svg.selectAll('path.lake').attr('d', path);
         svg.selectAll('.focused').classed('focused', focused = false);
+      }))
+    .call(d3.behavior.zoom()
+      .scale(projection.scale())
+      .scaleExtent([200, 800])
+      .on('zoom', function () {
+        var scale = d3.event.scale;
+        projection.scale(scale);
+        svg.selectAll('path.land').attr('d', path);
+        svg.selectAll('path.water').attr('d', path);
+        svg.selectAll('path.lake').attr('d', path);
       }));
 
   // Country focus on option select
