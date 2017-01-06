@@ -94,11 +94,14 @@ function ready(error, world, countryData) {
       }))
     .call(d3.behavior.zoom()
       .scale(projection.scale())
-      .scaleExtent([200, 1000])
+      .scaleExtent([120, 1000])
       .on('zoom', function () {
         var scale = d3.event.scale;
         projection.scale(scale);
-        sens = 0.25 - 0.2*((scale - 245)/(1000 - 245));
+
+        var scaleFactor = (scale - 245)/(1000 - 245);
+        sens = 0.25 - 0.2 * Math.sign(scaleFactor)*Math.sqrt(Math.abs(scaleFactor));
+
         svg.selectAll('path.land').attr('d', path);
         svg.selectAll('path.water').attr('d', path);
         svg.selectAll('path.lake').attr('d', path);
