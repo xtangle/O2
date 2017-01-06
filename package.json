@@ -4,7 +4,7 @@
   "description": "Team O2's entry for the RBC Hackathon",
   "private": true,
   "scripts": {
-    "start": "node src/webapp/server.js"
+    "start": "node src/server.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
     "cfenv": "^1.0.3",
     "express": "^4.14.0",
     "jquery": "^3.1.1",
+    "mongoose": "^4.7.6"
     "path": "^0.12.7",
     "socket.io": "^1.4.5"
   },
