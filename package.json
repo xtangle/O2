@@ -17,8 +17,12 @@
   },
   "homepage": "https://github.com/xtangle/O2#readme",
   "dependencies": {
+    "bootstrap": "^3.3.7",
+    "cfenv": "^1.0.3",
     "express": "^4.14.0",
-    "cfenv": "^1.0.3"
+    "jquery": "^3.1.1",
+    "path": "^0.12.7",
+    "socket.io": "^1.4.5"
   },
   "engines": {
     "node": "6.9.2"
