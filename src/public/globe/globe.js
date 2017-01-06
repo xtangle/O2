@@ -308,7 +308,6 @@ function getCookieValue(cookieName) {
       cookieValue = a[1].trim();
       return true;
     }
-    return false;
   });
   return cookieValue;
 }
