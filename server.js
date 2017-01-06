@@ -7,7 +7,7 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var port = 8080;
-
+ 
 // serve the files out of ./public as our main files
 app.use(express.static(path.resolve(__dirname, 'public')));
 
