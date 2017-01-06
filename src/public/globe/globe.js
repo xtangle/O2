@@ -1,11 +1,6 @@
 // Cash balance data
+const base_currency = 'USD';
 const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 100000, cash_excess = 1000000;
-var cashBalances = {};
-cashBalances['Canada'] = 80000;
-cashBalances['India'] = -800;
-cashBalances['Greece'] = -50000;
-cashBalances['China'] = 0;
-cashBalances['Finland'] = 700000;
 
 // Globe parameters
 const width = 600, height = 500;
@@ -41,27 +36,55 @@ var countryList = d3.select('body').append('select').attr('name', 'countries');
 
 queue()
   .defer(d3.json, 'globe/world-110m-withlakes.json')
-  .defer(d3.tsv, 'globe/world-110m-country-names.tsv')
+  .defer(d3.tsv, 'globe/world-110m-country-currency-data.tsv')
+  .defer(d3.json, '//api.fixer.io/latest?base=' + base_currency)
   .await(ready);
 
 // Main function
-function ready(error, world, countryData) {
+function ready(error, world, countryCurrencyData, conversionRates) {
+  if (error) {
+    throw error;
+  }
 
   var countryNames = {};
+  var currencyNames = {};
+  var currencyCodes = {};
+  var currencySymbols = {};
+  var cashBalances = {}; // Non-normalized cash balance amounts
+
   var countries = topojson.feature(world, world.objects.countries).features;
   var lakes = topojson.feature(world, world.objects.ne_110m_lakes).features;
 
-  // Adding countries to select
-  countryData.forEach(function(d) {
+  // Initialize data and adding countries to select
+  countryCurrencyData.forEach(function(d) {
     countryNames[d.id] = d.name;
-    option = countryList.append('option');
+    currencyNames[d.id] = d.currency_name;
+    currencyCodes[d.id] = d.currency_code;
+    currencySymbols[d.id] = d.currency_symbol_dec;
+
+    var option = countryList.append('option');
     option.text(d.name);
     option.property('value', d.id);
   });
 
+  // Initialize cash balances (for testing)
+  (function initializeCashBalances() {
+    var hasValue = function (val) {
+      return function (obj) { return obj.indexOf(val) !== -1; };
+    };
+    function indexOf(obj, val) {
+      return _.findKey(obj, hasValue(val));
+    }
+    cashBalances[indexOf(countryNames, 'Canada')] = 80000;
+    cashBalances[indexOf(countryNames, 'India')] = -800;
+    cashBalances[indexOf(countryNames, 'Greece')] = -50000;
+    cashBalances[indexOf(countryNames, 'China')] = 0;
+    cashBalances[indexOf(countryNames, 'Finland')] = 700000;
+  })();
+
   // Drawing countries on the globe
   countries.forEach(function(d) {
-    var cashBalance = cashBalances[countryNames[d.id]];
+    var cashBalance = cashBalances[d.id];
     var color = cashBalanceToColor(cashBalance);
     svg.selectAll('path#country-' + d.id)
       .data([d])
@@ -75,9 +98,8 @@ function ready(error, world, countryData) {
   svg.selectAll('path.land')
     // Mouse events
     .on('mouseover', function(d) {
-      var cashBalance = cashBalances[countryNames[d.id]];
-      countryTooltip.text(countryNames[d.id] + ((cashBalance !== undefined && cashBalance !== null) ?
-          '\nAmount: ' + formatCurrencyString(cashBalance) : ''))
+      var cashBalance = cashBalances[d.id];
+      countryTooltip.text(countryNames[d.id] + (_.isNil(cashBalance) ? '' : '\nAmount: ' + formatCurrencyString(cashBalance)))
         .style('left', (d3.event.pageX + 7) + 'px')
         .style('top', (d3.event.pageY - 15) + 'px')
         .style('display', 'block')
@@ -196,7 +218,7 @@ function ready(error, world, countryData) {
   }
 
   function formatCurrencyString(cashBalance) {
-    if (cashBalance === undefined || cashBalance === null) {
+    if (_.isNil(cashBalance)) {
       return '';
     } else if (cashBalance < 0) {
       return '-' + '$' + (-cashBalance);
