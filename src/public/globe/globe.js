@@ -2,7 +2,17 @@
 // Dependencies: jquery, lodash, socket.io, d3, d3.topojson, d3.queue
 
 // Socket.io
-var serverUrl = document.cookie.split(';')[0].split('=')[1];
+function getCookieValue(cookieName) {
+  var cookieValue = null;
+  document.cookie.split(';').forEach(function (cookie) {
+    var a = cookie.split('=');
+    if (a[0].trim() === cookieName) {
+      cookieValue = a[1].trim();
+    }
+  });
+  return cookieValue;
+}
+var serverUrl = getCookieValue('Server-URL');
 var socket = io(serverUrl);
 socket.emit('subscribe', 'message-from-server');
 socket.on('connect', function () {
