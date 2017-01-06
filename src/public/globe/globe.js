@@ -1,10 +1,19 @@
+// Cash balance data
+const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 10000, cash_excess = 1000000;
+var cashBalances = {};
+cashBalances['Canada'] = 40000;
+cashBalances['India'] = -800;
+cashBalances['Greece'] = -50000;
+cashBalances['China'] = 0;
+cashBalances['Finland'] = 800000;
+
+// Globe parameters
+const width = 600, height = 500;
 const sens_0 = 0.25, sens_adjust = 0.2;
 const scale_0 = 245, scale_min = 150, scale_max = 1000;
 
-var width = 600;
-var height = 500;
 var sens = sens_0;
-var focused;
+var focused = false;
 
 // Setting projection
 var projection = d3.geo.orthographic()
@@ -38,28 +47,38 @@ queue()
 // Main function
 function ready(error, world, countryData) {
 
-  var countryById = {};
+  var countryNames = {};
   var countries = topojson.feature(world, world.objects.countries).features;
   var lakes = topojson.feature(world, world.objects.ne_110m_lakes).features;
 
   // Adding countries to select
   countryData.forEach(function(d) {
-    countryById[d.id] = d.name;
+    countryNames[d.id] = d.name;
     option = countryList.append('option');
     option.text(d.name);
     option.property('value', d.id);
   });
 
   // Drawing countries on the globe
-  svg.selectAll('path.land')
-    .data(countries)
-    .enter().append('path')
-    .attr('class', 'land')
-    .attr('d', path)
+  countries.forEach(function(d) {
+    var cashBalance = cashBalances[countryNames[d.id]];
+    var color = cashBalanceToColor(cashBalance);
+    if (countryNames[d.id] === 'India') {
+      console.log(color);
+    }
+    svg.selectAll('path#country-' + d.id)
+      .data([d])
+      .enter().append('path')
+      .attr('class', 'land')
+      .attr('d', path)
+      .style('fill', 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')');
+  });
 
+  // Land events
+  svg.selectAll('path.land')
     // Mouse events
     .on('mouseover', function(d) {
-      countryTooltip.text(countryById[d.id])
+      countryTooltip.text(countryNames[d.id])
         .style('left', (d3.event.pageX + 7) + 'px')
         .style('top', (d3.event.pageY - 15) + 'px')
         .style('display', 'block')
@@ -141,6 +160,38 @@ function ready(error, world, countryData) {
         return cnt[i];
       }
     }
+  }
+
+  function cashBalanceToColor(cashBalance) {
+    var r, g, b, f;
+    if (cashBalance === null || cashBalance === undefined) {
+      r = g = b = 177;
+    } else if (cashBalance < cash_danger) {
+      r = 255;
+      g = 0;
+      b = 0;
+    } else if (cashBalance < cash_warn) {
+      f = Math.min(1, (cashBalance - cash_warn)/(cash_danger - cash_warn));
+      r = 255;
+      g = 127 - Math.floor(127 * f);
+      b = 0;
+    } else if (cashBalance < cash_zero) {
+      f = Math.min(1, (cashBalance - cash_zero)/(cash_warn - cash_zero));
+      r = 255;
+      g = 255 - Math.floor(128 * f);
+      b = 0;
+    } else if (cashBalance < cash_ok) {
+      f = Math.min(1, (cashBalance - cash_zero)/(cash_ok - cash_zero));
+      r = 255 - Math.floor(255*Math.sqrt(f));
+      g = 255;
+      b = 0;
+    } else {
+      f = Math.min(1, (cashBalance - cash_ok)/(cash_excess - cash_ok));
+      r = 0;
+      g = 255;
+      b = Math.floor(255*f);
+    }
+    return {r: r, g: g, b: b};
   }
 
 }
