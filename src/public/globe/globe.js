@@ -198,8 +198,11 @@ function ready(error, world, countryData) {
   function formatCurrencyString(cashBalance) {
     if (cashBalance === undefined || cashBalance === null) {
       return '';
+    } else if (cashBalance < 0) {
+      return '-' + '$' + (-cashBalance);
+    } else {
+      return '$' + cashBalance;
     }
-    return (cashBalance < 0 ? '-' : '') + '$' + cashBalance;
   }
 
 }
