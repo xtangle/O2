@@ -63,9 +63,6 @@ function ready(error, world, countryData) {
   countries.forEach(function(d) {
     var cashBalance = cashBalances[countryNames[d.id]];
     var color = cashBalanceToColor(cashBalance);
-    if (countryNames[d.id] === 'India') {
-      console.log(color);
-    }
     svg.selectAll('path#country-' + d.id)
       .data([d])
       .enter().append('path')
