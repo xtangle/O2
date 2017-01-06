@@ -2,7 +2,8 @@
 // Dependencies: jquery, lodash, socket.io, d3, d3.topojson, d3.queue
 
 // Socket.io
-var socket = io('//localhost:8080');
+var serverUrl = document.cookie.split(';')[0].split('=')[1];
+var socket = io(serverUrl);
 socket.emit('subscribe', 'message-from-server');
 socket.on('connect', function () {
   socket.on('message-from-server', function (data) {

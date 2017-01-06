@@ -5,13 +5,17 @@ var cfenv = require('cfenv');
 var connectionManager = require('./src/connection-manager');
 
 var app = express();
-var port = 8080;
+var appEnv = cfenv.getAppEnv();
 
 // initialize the database connection
 connectionManager.init();
 
 // serve the files out of ./public as our main files
 app.use(express.static(path.resolve(__dirname, 'src/public')));
+app.get('/index.html', function(req, res, next) {
+  res.cookie('Server-URL' , appEnv.url);
+  next();
+});
 
 // serve our RESTful services
 var router = express.Router();
@@ -46,8 +50,7 @@ io.on('connection', function(socket) {
 });
 
 // start server on the specified port and binding host
-var appEnv = cfenv.getAppEnv();
-server.listen(port, '0.0.0.0', function() {
+server.listen(appEnv.port, appEnv.bind, function() {
   // print a message when the server starts listening
-  console.log("server starting on " + appEnv.bind + ':' + port);
+  console.log("server starting on " + appEnv.url);
 });
