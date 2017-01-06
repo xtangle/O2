@@ -1,11 +1,11 @@
 // Cash balance data
-const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 10000, cash_excess = 1000000;
+const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 100000, cash_excess = 1000000;
 var cashBalances = {};
-cashBalances['Canada'] = 40000;
+cashBalances['Canada'] = 80000;
 cashBalances['India'] = -800;
 cashBalances['Greece'] = -50000;
 cashBalances['China'] = 0;
-cashBalances['Finland'] = 800000;
+cashBalances['Finland'] = 700000;
 
 // Globe parameters
 const width = 600, height = 500;
@@ -182,14 +182,14 @@ function ready(error, world, countryData) {
       b = 0;
     } else if (cashBalance < cash_ok) {
       f = Math.min(1, (cashBalance - cash_zero)/(cash_ok - cash_zero));
-      r = 255 - Math.floor(255*Math.sqrt(f));
+      r = 255 - Math.floor(255 * Math.sqrt(f));
       g = 255;
       b = 0;
     } else {
       f = Math.min(1, (cashBalance - cash_ok)/(cash_excess - cash_ok));
       r = 0;
       g = 255;
-      b = Math.floor(255*f);
+      b = Math.floor(255 * f);
     }
     return {r: r, g: g, b: b};
   }
