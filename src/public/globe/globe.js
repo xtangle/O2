@@ -1,11 +1,14 @@
+const sens_0 = 0.25, sens_adjust = 0.2;
+const scale_0 = 245, scale_min = 150, scale_max = 1000;
+
 var width = 600;
 var height = 500;
-var sens = 0.25;
+var sens = sens_0;
 var focused;
 
 // Setting projection
 var projection = d3.geo.orthographic()
-  .scale(245)
+  .scale(scale_0)
   .rotate([0, 0])
   .translate([width/2, height/2])
   .clipAngle(90);
@@ -94,13 +97,13 @@ function ready(error, world, countryData) {
       }))
     .call(d3.behavior.zoom()
       .scale(projection.scale())
-      .scaleExtent([120, 1000])
+      .scaleExtent([scale_min, scale_max])
       .on('zoom', function () {
         var scale = d3.event.scale;
         projection.scale(scale);
 
-        var scaleFactor = (scale - 245)/(1000 - 245);
-        sens = 0.25 - 0.2 * Math.sign(scaleFactor)*Math.sqrt(Math.abs(scaleFactor));
+        var scaleFactor = (scale - scale_0)/Math.max(scale_max - scale_0, scale_0 - scale_min);
+        sens = sens_0 - sens_adjust * Math.sign(scaleFactor)*Math.sqrt(Math.abs(scaleFactor));
 
         svg.selectAll('path.land').attr('d', path);
         svg.selectAll('path.water').attr('d', path);
