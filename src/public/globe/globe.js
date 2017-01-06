@@ -20,6 +20,7 @@ socket.on('connect', function () {
 // Cash balance parameters
 const base_currency_code = 'EUR', base_currency_symbol = '€';
 const conversion_rate_resource_url = '//api.fixer.io/latest?base=' + base_currency_code;
+const conversion_rate_update_period_ms = 60000;
 const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 100000, cash_excess = 1000000;
 
 // Globe parameters
@@ -217,12 +218,14 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
   // Set an interval to retrieve the latest conversion rates
   (function getConversionRates() {
     setTimeout(function () {
-      d3.json(conversion_rate_resource_url, function (data) {
+      // The random number appended to the url is to prevent caching
+      var rand = Math.floor(Math.random() * 1000000);
+      d3.json(conversion_rate_resource_url + '&rand' + rand, function (data) {
         conversionRatesData = data;
         conversionRates = conversionRatesData.rates;
         getConversionRates();
       });
-    }, 10000);
+    }, conversion_rate_update_period_ms);
   })();
 
   // Below are some helper functions
