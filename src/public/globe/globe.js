@@ -278,14 +278,14 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
     }
 
     if (cashBalance < 0) {
-      amountString += '-' + currencySymbol + (-cashBalance) + ' ' + currencyCode;
+      amountString += '-' + currencySymbol + (-cashBalance).toLocaleString() + ' ' + currencyCode;
       if (displayBaseCurrency) {
-        amountString += ' (-' + base_currency_symbol + (-normalizedCashBalance) + ' ' + base_currency_code + ')';
+        amountString += ' (-' + base_currency_symbol + (-normalizedCashBalance).toLocaleString() + ' ' + base_currency_code + ')';
       }
     } else {
-      amountString += currencySymbol + cashBalance + ' ' + currencyCode;
+      amountString += currencySymbol + cashBalance.toLocaleString() + ' ' + currencyCode;
       if (displayBaseCurrency) {
-        amountString += ' (' + base_currency_symbol + normalizedCashBalance + ' ' + base_currency_code + ')';
+        amountString += ' (' + base_currency_symbol + normalizedCashBalance.toLocaleString() + ' ' + base_currency_code + ')';
       }
     }
     return amountString;
