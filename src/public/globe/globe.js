@@ -18,7 +18,7 @@ socket.on('connect', function () {
 });
 
 // Cash balance parameters
-const base_currency = 'USD';
+const base_currency_code = 'USD', base_currency_symbol = '$';
 const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 100000, cash_excess = 1000000;
 
 // Globe parameters
@@ -32,8 +32,8 @@ var focused = false;
 // Setting projection
 var projection = d3.geo.orthographic()
   .scale(scale_0)
-  .rotate([0, 0])
-  .translate([width/2, height/2])
+  .rotate([0, -90])
+  .translate([width / 2, height / 2])
   .clipAngle(90);
 
 var path = d3.geo.path()
@@ -56,11 +56,11 @@ var countryList = d3.select('body').append('select').attr('name', 'countries');
 queue()
   .defer(d3.json, 'globe/world-110m-withlakes.json')
   .defer(d3.tsv, 'globe/world-110m-country-currency-data.tsv')
-  .defer(d3.json, '//api.fixer.io/latest?base=' + base_currency)
+  .defer(d3.json, '//api.fixer.io/latest?base=' + base_currency_code)
   .await(ready);
 
 // Main function
-function ready(error, world, countryCurrencyData, conversionRates) {
+function ready(error, world, countryCurrencyData, conversionRatesData) {
   if (error) {
     throw error;
   }
@@ -70,12 +70,13 @@ function ready(error, world, countryCurrencyData, conversionRates) {
   var currencyCodes = {};
   var currencySymbols = {};
   var cashBalances = {}; // Non-normalized cash balance amounts
+  var conversionRates = conversionRatesData.rates;
 
   var countries = topojson.feature(world, world.objects.countries).features;
   var lakes = topojson.feature(world, world.objects.ne_110m_lakes).features;
 
   // Initialize data and adding countries to select
-  countryCurrencyData.forEach(function(d) {
+  countryCurrencyData.forEach(function (d) {
     countryNames[d.id] = d.name;
     currencyNames[d.id] = d.currency_name;
     currencyCodes[d.id] = d.currency_code;
@@ -87,21 +88,19 @@ function ready(error, world, countryCurrencyData, conversionRates) {
   });
 
   // Initialize cash balances (for testing)
-  (function initializeCashBalances() {
-    function indexOf(obj, value) {
-      return _.findKey(obj, function (v) { return v === value; });
-    }
-    cashBalances[indexOf(countryNames, 'Canada')] = 80000;
-    cashBalances[indexOf(countryNames, 'India')] = -800;
-    cashBalances[indexOf(countryNames, 'Greece')] = -50000;
-    cashBalances[indexOf(countryNames, 'China')] = 0;
-    cashBalances[indexOf(countryNames, 'Finland')] = 700000;
-  })();
+  cashBalances[indexOf(countryNames, 'Canada')] = 80000;
+  cashBalances[indexOf(countryNames, 'United States')] = 500000;
+  cashBalances[indexOf(countryNames, 'India')] = -80000;
+  cashBalances[indexOf(countryNames, 'Greece')] = -50000;
+  cashBalances[indexOf(countryNames, 'China')] = 0;
+  cashBalances[indexOf(countryNames, 'Finland')] = 1000000;
 
   // Drawing countries on the globe
-  countries.forEach(function(d) {
+  countries.forEach(function (d) {
     var cashBalance = cashBalances[d.id];
-    var color = cashBalanceToColor(cashBalance);
+    var currencyCode = currencyCodes[d.id];
+    var normalizedCashBalance = getNormalizedCashBalance(cashBalance, currencyCode);
+    var color = cashBalanceToColor(normalizedCashBalance);
     svg.selectAll('path#country-' + d.id)
       .data([d])
       .enter().append('path')
@@ -112,25 +111,25 @@ function ready(error, world, countryCurrencyData, conversionRates) {
 
   // Land events
   svg.selectAll('path.land')
-    // Mouse events
-    .on('mouseover', function(d) {
+  // Mouse events
+    .on('mouseover', function (d) {
       var cashBalance = cashBalances[d.id];
       var currencySymbol = currencySymbols[d.id];
       var currencyName = currencyNames[d.id];
       var currencyCode = currencyCodes[d.id];
       countryTooltip.text(countryNames[d.id] +
-        (_.isNil(cashBalance) || _.isNil(currencySymbol) ? '' : '\nAmount: ' + formatCurrencyString(cashBalance, currencySymbol)) +
-        (_.isNil(currencyName) || _.isNil(currencyCode) ? '' : '\nCurrency: ' + currencyName + ' (' + currencyCode + ')'))
+        (_.isNil(cashBalance) || _.isNil(currencySymbol) ? '' : '\nAmount: ' + getAmountString(cashBalance, currencyCode, currencySymbol)) +
+        (_.isNil(currencyName) ? '' : '\nCurrency: ' + currencyName))
         .style('left', (d3.event.pageX + 7) + 'px')
         .style('top', (d3.event.pageY - 15) + 'px')
         .style('display', 'block')
         .style('opacity', 1);
     })
-    .on('mouseout', function(d) {
+    .on('mouseout', function (d) {
       countryTooltip.style('opacity', 0)
         .style('display', 'none');
     })
-    .on('mousemove', function(d) {
+    .on('mousemove', function (d) {
       countryTooltip.style('left', (d3.event.pageX + 7) + 'px')
         .style('top', (d3.event.pageY - 15) + 'px');
     });
@@ -144,13 +143,13 @@ function ready(error, world, countryCurrencyData, conversionRates) {
 
   // Globe events
   svg.selectAll('path')
-    // Drag event
+  // Drag event
     .call(d3.behavior.drag()
-      .origin(function() {
+      .origin(function () {
         var r = projection.rotate();
         return {x: r[0] / sens, y: -r[1] / sens};
       })
-      .on('drag', function() {
+      .on('drag', function () {
         var rotate = projection.rotate();
         projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
         svg.selectAll('path.land').attr('d', path);
@@ -165,8 +164,8 @@ function ready(error, world, countryCurrencyData, conversionRates) {
         var scale = d3.event.scale;
         projection.scale(scale);
 
-        var scaleFactor = (scale - scale_0)/Math.max(scale_max - scale_0, scale_0 - scale_min);
-        sens = sens_0 - sens_adjust * Math.sign(scaleFactor)*Math.sqrt(Math.abs(scaleFactor));
+        var scaleFactor = (scale - scale_0) / Math.max(scale_max - scale_0, scale_0 - scale_min);
+        sens = sens_0 - sens_adjust * Math.sign(scaleFactor) * Math.sqrt(Math.abs(scaleFactor));
 
         svg.selectAll('path.land').attr('d', path);
         svg.selectAll('path.water').attr('d', path);
@@ -174,7 +173,7 @@ function ready(error, world, countryCurrencyData, conversionRates) {
       }));
 
   // Country focus on option select
-  d3.select('select').on('change', function() {
+  d3.select('select').on('change', function () {
     var rotate = projection.rotate(),
       focusedCountry = country(countries, this),
       p = d3.geo.centroid(focusedCountry);
@@ -185,12 +184,12 @@ function ready(error, world, countryCurrencyData, conversionRates) {
     (function transition() {
       d3.transition()
         .duration(2500)
-        .tween('rotate', function() {
+        .tween('rotate', function () {
           var r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
-          return function(t) {
+          return function (t) {
             projection.rotate(r(t));
             svg.selectAll('path').attr('d', path)
-              .classed('focused', function(d, i) {
+              .classed('focused', function (d, i) {
                 return d.id == focusedCountry.id ? focused = d : false;
               });
           };
@@ -200,37 +199,43 @@ function ready(error, world, countryCurrencyData, conversionRates) {
 
   function country(cnt, sel) {
     for (var i = 0, l = cnt.length; i < l; i++) {
-      if(cnt[i].id == sel.value) {
+      if (cnt[i].id == sel.value) {
         return cnt[i];
       }
     }
   }
 
+  function indexOf(obj, value) {
+    return _.findKey(obj, function (v) {
+      return v === value;
+    });
+  }
+
   function cashBalanceToColor(cashBalance) {
     var r, g, b, f;
-    if (cashBalance === null || cashBalance === undefined) {
+    if (_.isNil(cashBalance)) {
       r = g = b = 177;
     } else if (cashBalance < cash_danger) {
       r = 255;
       g = 0;
       b = 0;
     } else if (cashBalance < cash_warn) {
-      f = Math.min(1, (cashBalance - cash_warn)/(cash_danger - cash_warn));
+      f = Math.min(1, (cashBalance - cash_warn) / (cash_danger - cash_warn));
       r = 255;
       g = 127 - Math.floor(127 * f);
       b = 0;
     } else if (cashBalance < cash_zero) {
-      f = Math.min(1, (cashBalance - cash_zero)/(cash_warn - cash_zero));
+      f = Math.min(1, (cashBalance - cash_zero) / (cash_warn - cash_zero));
       r = 255;
       g = 255 - Math.floor(128 * f);
       b = 0;
     } else if (cashBalance < cash_ok) {
-      f = Math.min(1, (cashBalance - cash_zero)/(cash_ok - cash_zero));
+      f = Math.min(1, (cashBalance - cash_zero) / (cash_ok - cash_zero));
       r = 255 - Math.floor(255 * Math.sqrt(f));
       g = 255;
       b = 0;
     } else {
-      f = Math.min(1, (cashBalance - cash_ok)/(cash_excess - cash_ok));
+      f = Math.min(1, (cashBalance - cash_ok) / (cash_excess - cash_ok));
       r = 0;
       g = 255;
       b = Math.floor(255 * f);
@@ -238,12 +243,37 @@ function ready(error, world, countryCurrencyData, conversionRates) {
     return {r: r, g: g, b: b};
   }
 
-  function formatCurrencyString(cashBalance, currencySymbol) {
-    if (cashBalance < 0) {
-      return '-' + currencySymbol + (-cashBalance);
+  function getNormalizedCashBalance(cashBalance, currencyCode) {
+    if (_.isNil(cashBalance) || _.isNil(currencyCode)) {
+      return null;
+    } else if (currencyCode === base_currency_code) {
+      return cashBalance;
     } else {
-      return currencySymbol + cashBalance;
+      return Math.round(cashBalance / conversionRates[currencyCode]);
     }
+  }
+
+  function getAmountString(cashBalance, currencyCode, currencySymbol) {
+    var amountString = '';
+    var displayBaseCurrency = (currencyCode !== base_currency_code);
+    var normalizedCashBalance;
+
+    if (displayBaseCurrency) {
+      normalizedCashBalance = getNormalizedCashBalance(cashBalance, currencyCode);
+    }
+
+    if (cashBalance < 0) {
+      amountString += '-' + currencySymbol + (-cashBalance) + ' ' + currencyCode;
+      if (displayBaseCurrency) {
+        amountString += ' (-' + base_currency_symbol + (-normalizedCashBalance) + ' ' + base_currency_code + ')';
+      }
+    } else {
+      amountString += currencySymbol + cashBalance + ' ' + currencyCode;
+      if (displayBaseCurrency) {
+        amountString += ' (' + base_currency_symbol + normalizedCashBalance + ' ' + base_currency_code + ')';
+      }
+    }
+    return amountString;
   }
 
 }
