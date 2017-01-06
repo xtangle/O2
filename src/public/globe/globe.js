@@ -88,12 +88,19 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
   });
 
   // Initialize cash balances (for testing)
-  cashBalances[indexOf(countryNames, 'Canada')] = 80000;
-  cashBalances[indexOf(countryNames, 'United States')] = 500000;
-  cashBalances[indexOf(countryNames, 'India')] = -80000;
-  cashBalances[indexOf(countryNames, 'Greece')] = -50000;
-  cashBalances[indexOf(countryNames, 'China')] = 0;
-  cashBalances[indexOf(countryNames, 'Finland')] = 1000000;
+  (function initializeCashBalances() {
+    function setCashBalancesForCurrency(currencyCode, cashBalance) {
+      indicesOf(currencyCodes, currencyCode).forEach(function (i) {
+        cashBalances[i] = cashBalance;
+      });
+    }
+    setCashBalancesForCurrency('CAD', 80000);
+    setCashBalancesForCurrency('USD', 600000);
+    setCashBalancesForCurrency('INR', -80000);
+    setCashBalancesForCurrency('EUR', 1000000);
+    setCashBalancesForCurrency('CNY', 0);
+    setCashBalancesForCurrency('JPY', -50000);
+  })();
 
   // Drawing countries on the globe
   countries.forEach(function (d) {
@@ -205,9 +212,17 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
     }
   }
 
+  // Below are helper functions
+
   function indexOf(obj, value) {
     return _.findKey(obj, function (v) {
       return v === value;
+    });
+  }
+
+  function indicesOf(obj, value) {
+    return _.keys(obj).filter(function (k) {
+      return obj[k] === value;
     });
   }
 
