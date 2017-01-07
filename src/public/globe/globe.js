@@ -222,7 +222,7 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
     })();
   });
 
-  startAnimation();
+  startAnimation(false);
   startUpdatingConversionRates();
 
   // ================================================================
@@ -236,8 +236,8 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
   }
 
   // Start animating the rotation of the globe
-  function startAnimation() {
-    doRotate = true;
+  function startAnimation(autoRoate) {
+    doRotate = autoRoate;
     d3.timer(function() {
       var rotate = projection.rotate();
       projection.rotate([rotate[0] + rot_v_lambda, rotate[1] + rot_v_phi, rotate[2] + rot_v_gamma]);

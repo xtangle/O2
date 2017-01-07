@@ -34,7 +34,7 @@ var io = require('socket.io')(server);
 io.on('connection', function(socket) {
   console.log('new connection made');
 
-  var currencies = ['CAD', 'USD', 'EUR', 'GBP', 'CNY', 'JPY', 'INR', 'AUD'];
+  var currencies = ['CAD', 'USD', 'EUR'];
   var minAmount = 1000, maxAmount = 1000000;
 
   function getRandomCurrency() {
