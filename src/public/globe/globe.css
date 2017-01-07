@@ -12,17 +12,16 @@
   fill: #22448F;
   fill-opacity: 1;
   stroke: #FFF;
-  stroke-width: 0.5px;
+  stroke-width: 0.75px;
 }
 
 .land {
-  /*fill: #AAAAAA;*/
   stroke: #FFF;
-  stroke-width: 0.5px;
+  stroke-width: 0.75px;
 }
 
 .land:hover {
-  stroke-width: 1.2px;
+  stroke-width: 1.5px;
 }
 
 .focused {

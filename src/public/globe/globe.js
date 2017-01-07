@@ -129,7 +129,7 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
       .enter().append('path')
       .attr('class', 'land')
       .attr('d', path)
-      .style('fill', 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')');
+      .style('fill', color);
   });
 
   // Draw lakes on the globe
@@ -276,7 +276,7 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
   function cashBalanceToColor(cashBalance) {
     var r, g, b, f;
     if (_.isNil(cashBalance)) {
-      r = g = b = 177;
+      return '#333333';
     } else if (cashBalance < cash_danger) {
       r = 255;
       g = 0;
@@ -302,7 +302,9 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
       g = 255;
       b = Math.floor(255 * f);
     }
-    return {r: r, g: g, b: b};
+    return '#' + [r, g, b].map(function(c) {
+      return _.padStart(c.toString(16).toUpperCase(), 2, '0');
+    }).join('');
   }
 
   function getNormalizedCashBalance(cashBalance, currencyCode) {
