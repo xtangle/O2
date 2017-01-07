@@ -40,13 +40,14 @@ io.on('connection', function(socket) {
   function getRandomCurrency() {
     return currencies[Math.floor(Math.random() * currencies.length)];
   }
+
   function getRandomAmount() {
-    var amount = Math.floor((Math.random() * (maxAmount - minAmount)) + minAmount);
+    var amount = Math.floor(Math.random() * (maxAmount - minAmount)) + minAmount;
     var sign = Math.random() < 0.5 ? -1 : 1;
     return sign * amount;
   }
 
-  var autoEmit = setInterval(function(){
+  var autoEmit = setInterval(function() {
     socket.emit('message-from-server', {
       transaction: {
         settlementCurrency: getRandomCurrency(),

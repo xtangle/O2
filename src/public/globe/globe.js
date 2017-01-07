@@ -6,7 +6,6 @@ var socket = io();
 socket.emit('subscribe', 'message-from-server');
 socket.on('connect', function () {
   socket.on('message-from-server', function (data) {
-    console.log(data);
     // Update the transaction amount
     $('#transaction-amount').text(data.transaction.netSettlementAmount);
     // Update the transaction currency
@@ -33,7 +32,7 @@ var focused = false;
 // Setting projection
 var projection = d3.geo.orthographic()
   .scale(scale_0)
-  .rotate([0, -90])
+  .rotate([0, 0])
   .translate([width / 2, height / 2])
   .clipAngle(90);
 
@@ -152,7 +151,7 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
 
   // Globe events
   svg.selectAll('path')
-  // Drag event
+    // Drag event
     .call(d3.behavior.drag()
       .origin(function () {
         var r = projection.rotate();
@@ -214,15 +213,15 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
     }
   }
 
-  // Set an interval to retrieve the latest conversion rates
-  (function getConversionRates() {
+  // Periodically retrieve the latest conversion rates
+  (function updateConversionRates() {
     setTimeout(function () {
       // The random number appended to the url is to prevent caching
       var rand = Math.floor(Math.random() * 1000000);
       d3.json(conversion_rate_resource_url + '&rand' + rand, function (data) {
         conversionRatesData = data;
         conversionRates = conversionRatesData.rates;
-        getConversionRates();
+        updateConversionRates();
       });
     }, conversion_rate_update_period_ms);
   })();
