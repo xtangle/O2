@@ -3,6 +3,7 @@ var path = require('path');
 // cfenv provides access to your Cloud Foundry environment, for info see: https://www.npmjs.com/package/cfenv
 var cfenv = require('cfenv');
 var connectionManager = require('./src/connection-manager');
+var moment = require('moment');
 
 var app = express();
 var appEnv = cfenv.getAppEnv();
@@ -30,16 +31,27 @@ app.use('/api', router);
 // Socket.io
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-var buyT = function() {
-  return Math.floor((Math.random() * 100) + 1);
-};
 io.on('connection', function(socket) {
   console.log('new connection made');
+
+  var currencies = ['CAD', 'USD', 'EUR', 'GBP', 'CNY', 'JPY', 'INR'];
+  var minAmount = 1000, maxAmount = 50000;
+
+  function getRandomCurrency() {
+    return currencies[Math.floor(Math.random() * currencies.length)];
+  }
+  function getRandomAmount() {
+    var amount = Math.floor((Math.random() * (maxAmount - minAmount)) + minAmount);
+    var sign = Math.random() < 0.5 ? -1 : 1;
+    return sign * amount;
+  }
+
   var autoEmit = setInterval(function(){
     socket.emit('message-from-server', {
       transaction: {
-        currency:'CAD',
-        amount:buyT()
+        settlementCurrency: getRandomCurrency(),
+        netSettlementAmount: getRandomAmount(),
+        receivedDateAndTime: moment().format()
       }
     });
   }, 1000);

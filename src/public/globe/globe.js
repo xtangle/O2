@@ -7,12 +7,12 @@ socket.emit('subscribe', 'message-from-server');
 socket.on('connect', function () {
   socket.on('message-from-server', function (data) {
     console.log(data);
-    // Update the Market Name
-    $('#transaction').text(data.transaction.transaction);
-    // Update the Buy price
-    $('#currency').text(data.transaction.currency);
-    // Update the Sell price
-    $('#amount').text(data.transaction.amount);
+    // Update the transaction amount
+    $('#transaction-amount').text(data.transaction.netSettlementAmount);
+    // Update the transaction currency
+    $('#transaction-currency').text(data.transaction.settlementCurrency);
+    // Update the transaction date and time
+    $('#transaction-date').text(data.transaction.receivedDateAndTime);
   });
 });
 
