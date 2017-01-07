@@ -12,10 +12,6 @@ connectionManager.init();
 
 // serve the files out of ./public as our main files
 app.use(express.static(path.resolve(__dirname, 'src/public')));
-app.get('/index.html', function(req, res, next) {
-  res.cookie('Server-URL' , appEnv.url);
-  next();
-});
 
 // serve our RESTful services
 var router = express.Router();
