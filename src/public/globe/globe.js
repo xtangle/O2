@@ -12,6 +12,8 @@ socket.on('connect', function () {
     $('#transaction-currency').text(data.transaction.settlementCurrency);
     // Update the transaction date and time
     $('#transaction-date').text(data.transaction.receivedDateAndTime);
+
+    mainController.updateBal(data.transaction.settlementCurrency,data.transaction.netSettlementAmount);
   });
 });
 
@@ -106,10 +108,10 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
         cashBalances[i] = cashBalance;
       });
     }
-    setCashBalancesForCurrency('CAD', 80000);
-    setCashBalancesForCurrency('USD', 600000);
+    setCashBalancesForCurrency('CAD', cadInitBal);
+    setCashBalancesForCurrency('USD', usdInitBal);
     setCashBalancesForCurrency('INR', -80000);
-    setCashBalancesForCurrency('EUR', 12000000);
+    setCashBalancesForCurrency('EUR', eurInitBal);
     setCashBalancesForCurrency('GBP', 700000);
     setCashBalancesForCurrency('CNY', 0);
     setCashBalancesForCurrency('JPY', -50000);

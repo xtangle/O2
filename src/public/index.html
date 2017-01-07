@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="globe/globe.css">
 
   <script type="text/javascript" src="lib/jquery.js"></script>
+  <script type="text/javascript" src="js/mainController.js"></script>
   <script type="text/javascript" src="lib/lodash.min.js"></script>
   <script type='text/javascript' src='lib/socket.io.js'></script>
   <script type="text/javascript" src="lib/d3.v3.min.js"></script>
@@ -34,10 +35,32 @@
   </div>
 
   <div class="container col-md-12">
-    <div class="row">
-      <div class="col-md-6 col-md-offset-3">
-        <svg id="globe"></svg>
+    <div class="col-md-9">
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+          <svg id="globe"></svg>
+        </div>
       </div>
+    </div>
+    <div class="col-md-3 alignLeft">
+      <table class="table table-striped">
+        <tr>
+          <td><span class="bold">BALANCE</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>CAD</td>
+          <td><span id="cadBal"></span> </td>
+        </tr>
+        <tr>
+          <td>USD</td>
+          <td><span id="usdBal"></span> </td>
+        </tr>
+        <tr>
+          <td>EUR</td>
+          <td><span id="eurBal"></span> </td>
+        </tr>
+      </table>
     </div>
   </div>
 

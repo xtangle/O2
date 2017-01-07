@@ -1,3 +1,9 @@
+.alignLeft{
+  text-align: left;
+}
+.bold{
+  font-weight:bold;
+}
 .container {
   padding-top: 50px;
   text-align: center;
