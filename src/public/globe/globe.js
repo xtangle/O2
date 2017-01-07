@@ -15,24 +15,32 @@ socket.on('connect', function () {
   });
 });
 
+// ================================================================
+// Parameter definitions
+
 // Cash balance parameters
 const base_currency_code = 'EUR', base_currency_symbol = '€';
 const conversion_rate_resource_url = '//api.fixer.io/latest?base=' + base_currency_code;
-const conversion_rate_update_period_ms = 60000;
+const conversion_rate_update_period_in_ms = 60000;
 const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 100000, cash_excess = 1000000;
 
 // Globe parameters
-const width = 600, height = 500;
+const width = 600, height = 600;
 const sens_0 = 0.25, sens_adjust = 0.2;
-const scale_0 = 245, scale_min = 150, scale_max = 1000;
+const scale_0 = 300, scale_min = 150, scale_max = 1200;
+const rot_v_lambda = 0.18, rot_v_phi = 0, rot_v_gamma = 0;
 
 var sens = sens_0;
 var focused = false;
+var doRotate = true;
+
+// ================================================================
+// Globe setup
 
 // Setting projection
 var projection = d3.geo.orthographic()
   .scale(scale_0)
-  .rotate([0, 0])
+  .rotate([0, -30, 0])
   .translate([width / 2, height / 2])
   .clipAngle(90);
 
@@ -59,11 +67,15 @@ queue()
   .defer(d3.json, conversion_rate_resource_url)
   .await(ready);
 
+// ================================================================
 // Main function
 function ready(error, world, countryCurrencyData, conversionRatesData) {
   if (error) {
     throw error;
   }
+
+  // ================================================================
+  // Initializing data
 
   var countryNames = {};
   var currencyNames = {};
@@ -103,7 +115,10 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
     setCashBalancesForCurrency('JPY', -50000);
   })();
 
-  // Drawing countries on the globe
+  // ================================================================
+  // Initializing the globe
+
+  // Draw countries on the globe
   countries.forEach(function (d) {
     var cashBalance = cashBalances[d.id];
     var currencyCode = currencyCodes[d.id];
@@ -117,9 +132,15 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
       .style('fill', 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')');
   });
 
-  // Land events
+  // Draw lakes on the globe
+  svg.selectAll('path.lake')
+    .data(lakes)
+    .enter().append('path')
+    .attr('class', 'lake')
+    .attr('d', path);
+
+  // Register mouse events when on land
   svg.selectAll('path.land')
-  // Mouse events
     .on('mouseover', function (d) {
       var cashBalance = cashBalances[d.id];
       var currencySymbol = currencySymbols[d.id];
@@ -142,14 +163,7 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
         .style('top', (d3.event.pageY - 15) + 'px');
     });
 
-  // Drawing lakes on the globe
-  svg.selectAll('path.lake')
-    .data(lakes)
-    .enter().append('path')
-    .attr('class', 'lake')
-    .attr('d', path);
-
-  // Globe events
+  // Register globe events
   svg.selectAll('path')
     // Drag event
     .call(d3.behavior.drag()
@@ -160,8 +174,7 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
       .on('drag', function () {
         var rotate = projection.rotate();
         projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
-        svg.selectAll('path.land').attr('d', path);
-        svg.selectAll('path.lake').attr('d', path);
+        refresh();
         svg.selectAll('.focused').classed('focused', focused = false);
       }))
     // Zoom event
@@ -174,24 +187,28 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
 
         var scaleFactor = (scale - scale_0) / Math.max(scale_max - scale_0, scale_0 - scale_min);
         sens = sens_0 - sens_adjust * Math.sign(scaleFactor) * Math.sqrt(Math.abs(scaleFactor));
-
-        svg.selectAll('path.land').attr('d', path);
-        svg.selectAll('path.water').attr('d', path);
-        svg.selectAll('path.lake').attr('d', path);
+        refresh();
       }));
 
   // Country focus on option select
   d3.select('select').on('change', function () {
-    var rotate = projection.rotate(),
-      focusedCountry = country(countries, this),
-      p = d3.geo.centroid(focusedCountry);
+    function country(cnt, sel) {
+      for (var i = 0, l = cnt.length; i < l; i++) {
+        if (cnt[i].id == sel.value) {
+          return cnt[i];
+        }
+      }
+    }
 
+    var rotate = projection.rotate();
+    var focusedCountry = country(countries, this);
+    var p = d3.geo.centroid(focusedCountry);
     svg.selectAll('.focused').classed('focused', focused = false);
 
-    // Globe rotating
+    // Globe rotating to country
     (function transition() {
       d3.transition()
-        .duration(2500)
+        .duration(1500)
         .tween('rotate', function () {
           var r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
           return function (t) {
@@ -205,28 +222,50 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
     })();
   });
 
-  function country(cnt, sel) {
-    for (var i = 0, l = cnt.length; i < l; i++) {
-      if (cnt[i].id == sel.value) {
-        return cnt[i];
-      }
-    }
+  startAnimation();
+  startUpdatingConversionRates();
+
+  // ================================================================
+  // Common globe functions
+
+  // Refresh drawing of the globe
+  function refresh() {
+    svg.selectAll('path.land').attr('d', path);
+    svg.selectAll('path.water').attr('d', path);
+    svg.selectAll('path.lake').attr('d', path);
+  }
+
+  // Start animating the rotation of the globe
+  function startAnimation() {
+    doRotate = true;
+    d3.timer(function() {
+      var rotate = projection.rotate();
+      projection.rotate([rotate[0] + rot_v_lambda, rotate[1] + rot_v_phi, rotate[2] + rot_v_gamma]);
+      refresh();
+      return !doRotate;
+    });
+  }
+
+  function stopAnimation() {
+    doRotate = false;
+    refresh();
   }
 
   // Periodically retrieve the latest conversion rates
-  (function updateConversionRates() {
+  function startUpdatingConversionRates() {
     setTimeout(function () {
       // The random number appended to the url is to prevent caching
       var rand = Math.floor(Math.random() * 1000000);
       d3.json(conversion_rate_resource_url + '&rand' + rand, function (data) {
         conversionRatesData = data;
         conversionRates = conversionRatesData.rates;
-        updateConversionRates();
+        startUpdatingConversionRates();
       });
-    }, conversion_rate_update_period_ms);
-  })();
+    }, conversion_rate_update_period_in_ms);
+  }
 
-  // Below are some helper functions
+  // ================================================================
+  // Helper functions
 
   function indicesOf(obj, value) {
     return _.keys(obj).filter(function (k) {
