@@ -1,5 +1,5 @@
 // globe.js
-// Dependencies: jquery, lodash, socket.io, d3, d3.topojson, d3.queue, jquery.tablesorter, cashBalanceController.js
+// Dependencies: jquery, lodash, d3, d3.topojson, d3.queue, jquery.tablesorter, cashBalanceController.js
 
 // ================================================================
 // Parameter definitions
@@ -8,8 +8,11 @@
 const width = 600, height = 600;
 const sens_0 = 0.25, sens_adjust = 0.2;
 const scale_0 = 300, scale_min = 150, scale_max = 1200;
+
+const rot_lambda_0 = 90, rot_phi_0 = -20, rot_gamma_0 = 0;
 const rot_phi_limit = 90;
 const rot_v_lambda = -0.2, rot_v_phi = 0, rot_v_gamma = 0;
+
 const cash_bal_danger = -10000, cash_bal_warn = -1000, cash_bal_zero = 0, cash_bal_ok = 100000, cash_bal_excess = 1000000;
 
 var sens = sens_0;
@@ -29,7 +32,7 @@ cashBalanceTable.find('.base-currency-header')
 // Setting projection
 var projection = d3.geo.orthographic()
   .scale(scale_0)
-  .rotate([90, -20, 0])
+  .rotate([rot_lambda_0, rot_phi_0, rot_gamma_0])
   .translate([width / 2, height / 2])
   .clipAngle(90);
 
