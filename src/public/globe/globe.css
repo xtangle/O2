@@ -5,7 +5,10 @@
   display:none;
 }
 .tableTitle{
-  font-size: 18px;
+  font-size: 20px;
+  font-weight:bold;
+}
+.bold{
   font-weight:bold;
 }
 .container {
