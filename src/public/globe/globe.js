@@ -61,7 +61,10 @@ svg.append('path')
   .attr('d', path);
 
 var countryTooltip = d3.select('body').append('div').attr('class', 'countryTooltip');
-var countryList = d3.select('body').append('select').attr('name', 'countries');
+var countryList = d3.select('body').append('select').attr({
+  name: 'countries',
+  class: 'countryDropdown'
+});
 
 queue()
   .defer(d3.json, 'globe/world-110m-withlakes.json')

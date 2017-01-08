@@ -15,23 +15,28 @@
 
 </head>
 <body>
-  <h3>Socket test</h3>
 
-  <div class="header col-md-12">
-    <div class="row bg-primary">
-      <div class="col-md-4">
-        <h1>Net Settlement Amount</h1>
-        <h2 id="transaction-amount"></h2>
-      </div>
-      <div class="col-md-4">
-        <h1>Settlement Currency</h1>
-        <h2 id="transaction-currency"></h2>
-      </div>
-      <div class="col-md-4">
-        <h1>Received Date and Time</h1>
-        <h2 id="transaction-date"></h2>
-      </div>
-    </div>
+
+  <div class="container col-md-12">
+    <h1>O2 - CASH FLOW TRACKER</h1>
+    <table class="table table-striped alignLeft">
+      <tr>
+        <td><span class="bold tableTitle">Most Recent transaction</span></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Net Settlement Amount</td>
+        <td>Settlement Currency</td>
+        <td>Received Date and Time</td>
+      </tr>
+      <tr>
+        <td><span id="transaction-amount"></span></td>
+        <td><span id="transaction-currency"></span> </td>
+        <td><span id="transaction-date"></span> </td>
+      </tr>
+
+    </table>
   </div>
 
   <div class="container col-md-12">
@@ -45,7 +50,7 @@
     <div class="col-md-3 alignLeft">
       <table class="table table-striped">
         <tr>
-          <td><span class="bold">BALANCE</span></td>
+          <td><span class="bold tableTitle">CURRENT BALANCE</span></td>
           <td></td>
         </tr>
         <tr>

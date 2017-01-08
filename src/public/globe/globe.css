@@ -1,7 +1,11 @@
 .alignLeft{
   text-align: left;
 }
-.bold{
+.countryDropdown{
+  display:none;
+}
+.tableTitle{
+  font-size: 18px;
   font-weight:bold;
 }
 .container {
