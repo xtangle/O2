@@ -1,5 +1,5 @@
 // globe.js
-// Dependencies: jquery, lodash, socket.io, d3, d3.topojson, d3.queue, cashBalanceController.js
+// Dependencies: jquery, lodash, socket.io, d3, d3.topojson, d3.queue, jquery.tablesorter, cashBalanceController.js
 
 // ================================================================
 // Parameter definitions
@@ -93,7 +93,6 @@ function ready(error, world) {
 
   // ================================================================
   // Initializing the globe
-
 
   var countries = topojson.feature(world, world.objects.countries).features;
   var lakes = topojson.feature(world, world.objects.ne_110m_lakes).features;
