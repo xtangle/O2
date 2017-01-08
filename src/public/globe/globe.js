@@ -15,12 +15,14 @@ var sens = sens_0;
 var focused = false;
 var animate = true;
 var hoveredId;
+var tableSorterInitialized = false;
 
 // ================================================================
 // Globe setup
 
 // Set base currency header in cash balance table
-$('#cash-balance-table').find('.base-currency-header span')
+const cashBalanceTable = $('#cash-balance-table');
+cashBalanceTable.find('.base-currency-header')
   .text('Cash Balance (' + cashBalCtrl.getBaseCurrencyCode() + ')');
 
 // Setting projection
@@ -91,6 +93,8 @@ function ready(error, world) {
 
   // ================================================================
   // Initializing the globe
+
+
 
   var countries = topojson.feature(world, world.objects.countries).features;
   var lakes = topojson.feature(world, world.objects.ne_110m_lakes).features;
@@ -195,29 +199,44 @@ function ready(error, world) {
     var cashBalance = cashBalCtrl.getCashBalanceString(id);
     var cashBalanceInBaseCurrency = cashBalCtrl.getCashBalanceString(id, {inBaseCurrency: true});
 
-    var cashBalanceTable = $('#cash-balance-table');
-    var currencyRow = cashBalanceTable.find('tr td:first-child:contains(' + currencyCode + ')').parent();
+    var currencyRow = cashBalanceTable.find('tbody tr td:first-child:contains(' + currencyCode + ')').parent();
 
     if (currencyRow.length > 0) {
       currencyRow.find('.cash-balance').text(cashBalance);
       currencyRow.find('.cash-balance-base-currency').text(cashBalanceInBaseCurrency);
     } else {
-      cashBalanceTable.find('tr:last').after($('<tr>')
+      cashBalanceTable.find('tbody').append($('<tr>')
         .append($('<td>')
           .addClass('bold')
           .text(currencyCode))
         .append($('<td>')
           .addClass('cash-balance')
           .css('text-align', 'right')
-          .append($('<span>')
-            .text(cashBalance)))
+          .text(cashBalance))
         .append($('<td>')
           .addClass('cash-balance-base-currency')
           .css('text-align', 'right')
-          .append($('<span>')
-            .text(cashBalanceInBaseCurrency)))
+          .text(cashBalanceInBaseCurrency))
       );
     }
+
+    if (!tableSorterInitialized) {
+      // Initialize table sorter (needs to be here because table must have data first)
+      cashBalanceTable.tablesorter({
+        // Default sort
+        sortList: [[2, 1]],
+        // Remove commas from the string
+        textExtraction: function(node) {
+          return node.innerHTML.replace(/,/g, '');
+        }
+      });
+      tableSorterInitialized = true;
+    }
+
+    // Update sorting on the table
+    cashBalanceTable.trigger('update');
+    var sorting = cashBalanceTable.get(0).config.sortList;
+    cashBalanceTable.trigger('sorton', [sorting]);
   }
 
   // Start/stop animating the rotation of the globe
@@ -283,5 +302,4 @@ function ready(error, world) {
     }
     return amountString;
   }
-
 }

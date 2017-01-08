@@ -6,6 +6,10 @@
   text-align: right;
 }
 
+.align-center {
+  text-align: center;
+}
+
 .table-title {
   font-size: 20px;
   font-weight: bold;
@@ -17,7 +21,6 @@
 
 .container {
   padding-top: 20px;
-  text-align: center;
 }
 
 .water {
@@ -62,4 +65,16 @@
   font-size: 14px;
   font-family: sans-serif;
   white-space: pre-wrap;
+}
+
+table.tablesorter th {
+  cursor: pointer;
+}
+
+th.headerSortUp::after {
+  content: url('../img/small_asc.gif');
+}
+
+th.headerSortDown::after {
+  content: url('../img/small_desc.gif');
 }
