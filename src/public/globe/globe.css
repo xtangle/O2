@@ -1,9 +1,7 @@
-.alignLeft{
+.alignLeft {
   text-align: left;
 }
-.countryDropdown{
-  display:none;
-}
+
 .tableTitle{
   font-size: 20px;
   font-weight:bold;
@@ -12,7 +10,7 @@
   font-weight:bold;
 }
 .container {
-  padding-top: 50px;
+  padding-top: 20px;
   text-align: center;
 }
 
@@ -41,13 +39,9 @@
   fill: #33CC33;
 }
 
-select {
-  position: absolute;
-  top: 20px;
-  left: 580px;
-  border: solid #ccc 1px;
-  padding: 3px;
-  box-shadow: inset 1px 1px 2px #ddd8dc;
+.animate-container {
+  text-align: right;
+  margin-right: 80px;
 }
 
 .countryTooltip {

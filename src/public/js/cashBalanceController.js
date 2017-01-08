@@ -67,7 +67,7 @@ var cashBalCtrl = (function () {
       if (_.isNil(cashBalances[i])) {
         return '';
       }
-      return (cashBalances[i] < 0 ? '-' : '') + (_.get(options, 'inBaseCurrency') ?
+      return (Math.round(cashBalances[i]) < 0 ? '-' : '') + (_.get(options, 'inBaseCurrency') ?
           base_currency_symbol + Math.round(Math.abs(cashBalancesInBaseCurrency[i])).toLocaleString() :
           currencySymbols[i] + Math.round(Math.abs(cashBalances[i])).toLocaleString());
     },

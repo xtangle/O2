@@ -8,12 +8,12 @@
 const width = 600, height = 600;
 const sens_0 = 0.25, sens_adjust = 0.2;
 const scale_0 = 300, scale_min = 150, scale_max = 1200;
-const rot_v_lambda = 0.18, rot_v_phi = 0, rot_v_gamma = 0;
+const rot_v_lambda = -0.2, rot_v_phi = 0, rot_v_gamma = 0;
 const cash_bal_danger = -10000, cash_bal_warn = -1000, cash_bal_zero = 0, cash_bal_ok = 100000, cash_bal_excess = 1000000;
 
 var sens = sens_0;
 var focused = false;
-var doRotate = true;
+var animate = true;
 var hoveredId;
 
 // ================================================================
@@ -26,7 +26,7 @@ $('#cash-balance-table').find('.base-currency-header')
 // Setting projection
 var projection = d3.geo.orthographic()
   .scale(scale_0)
-  .rotate([0, -90, 0])
+  .rotate([90, -20, 0])
   .translate([width / 2, height / 2])
   .clipAngle(90);
 
@@ -57,6 +57,17 @@ function ready(error, world) {
   if (error) {
     throw error;
   }
+
+  // Initialize DOM
+  var animateCheckbox = $('#animate');
+  animateCheckbox.prop('checked', animate);
+  animateCheckbox.on('click', function () {
+    if (animate) {
+      stopAnimation();
+    } else {
+      startAnimation();
+    }
+  });
 
   // Re-color the affected countries, update the tooltip, and the cash balances table when cash balance is updated
   cashBalCtrl.onCashBalanceUpdate(function (ids) {
@@ -145,6 +156,10 @@ function ready(error, world) {
         refresh();
       }));
 
+  if (animate) {
+    startAnimation();
+  }
+
   // ================================================================
   // Common globe functions
 
@@ -175,7 +190,6 @@ function ready(error, world) {
     var currencyRow = cashBalanceTable.find('tr td:first-child:contains(' + currencyCode + ')').parent();
 
     if (currencyRow.length > 0) {
-      console.log(currencyRow);
       currencyRow.find('.cash-balance').text(cashBalance);
       currencyRow.find('.cash-balance-base-currency').text(cashBalanceInBaseCurrency);
     } else {
@@ -197,17 +211,17 @@ function ready(error, world) {
 
   // Start/stop animating the rotation of the globe
   function startAnimation() {
-    doRotate = true;
+    animate = true;
     d3.timer(function () {
       var rotate = projection.rotate();
       projection.rotate([rotate[0] + rot_v_lambda, rotate[1] + rot_v_phi, rotate[2] + rot_v_gamma]);
       refresh();
-      return !doRotate;
+      return !animate;
     });
   }
 
   function stopAnimation() {
-    doRotate = false;
+    animate = false;
     refresh();
   }
 
