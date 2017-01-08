@@ -42,7 +42,7 @@ var doRotate = true;
 // Setting projection
 var projection = d3.geo.orthographic()
   .scale(scale_0)
-  .rotate([0, -30, 0])
+  .rotate([0, -90, 0])
   .translate([width / 2, height / 2])
   .clipAngle(90);
 
@@ -312,6 +312,8 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
     }).join('');
   }
 
+  // $('.countryDropdown option[value="124"]').attr('selected','selected').trigger('change');
+  $('.countryDropdown').val(124).trigger('change');
   function getNormalizedCashBalance(cashBalance, currencyCode) {
     if (_.isNil(cashBalance) || _.isNil(currencyCode)) {
       return null;
