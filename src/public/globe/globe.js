@@ -8,6 +8,7 @@
 const width = 600, height = 600;
 const sens_0 = 0.25, sens_adjust = 0.2;
 const scale_0 = 300, scale_min = 150, scale_max = 1200;
+const rot_phi_limit = 90;
 const rot_v_lambda = -0.2, rot_v_phi = 0, rot_v_gamma = 0;
 const cash_bal_danger = -10000, cash_bal_warn = -1000, cash_bal_zero = 0, cash_bal_ok = 100000, cash_bal_excess = 1000000;
 
@@ -150,7 +151,14 @@ function ready(error, world) {
       })
       .on('drag', function () {
         var rotate = projection.rotate();
-        projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
+        var lambda = d3.event.x * sens;
+        var phi = -d3.event.y * sens;
+        var gamma = rotate[2];
+        //Restriction for rotating upside-down
+        if (Math.abs(phi) > rot_phi_limit) {
+          phi = Math.sign(phi) * rot_phi_limit;
+        }
+        projection.rotate([lambda, phi, gamma]);
         refresh();
         svg.selectAll('.focused').classed('focused', focused = false);
       }))

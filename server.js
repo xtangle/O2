@@ -35,18 +35,19 @@ io.on('connection', function (socket) {
   console.log('new connection made');
 
   var currencies = ['CAD', 'USD', 'EUR', 'GBP', 'CNY', 'JPY', 'INR', 'AUD'];
+  var sigma = 100000, mu = 5000;
+
+  function randNorm() {
+    var u = 1 - Math.random();
+    var v = 1 - Math.random();
+    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+  }
 
   function getRandomCurrency() {
     return currencies[Math.floor(Math.random() * currencies.length)];
   }
 
   function getRandomAmount() {
-    function randNorm() {
-      var u = 1 - Math.random();
-      var v = 1 - Math.random();
-      return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-    }
-    var sigma = 100000, mu = 5000;
     var amount = Math.pow(randNorm(), 2) * sigma + mu;
     var sign = Math.random() < 0.49 ? -1 : 1;
     return sign * amount;
