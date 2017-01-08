@@ -1,14 +1,20 @@
-.alignLeft {
+.align-left {
   text-align: left;
 }
 
-.tableTitle{
+.align-right {
+  text-align: right;
+}
+
+.table-title {
   font-size: 20px;
-  font-weight:bold;
+  font-weight: bold;
 }
-.bold{
-  font-weight:bold;
+
+.bold {
+  font-weight: bold;
 }
+
 .container {
   padding-top: 20px;
   text-align: center;

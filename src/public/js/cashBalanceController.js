@@ -19,6 +19,7 @@ var cashBalCtrl = (function () {
   var currencySymbols = {};
   var conversionRates = {};
 
+  var newTransactionCallback = _.noop();
   var cashBalanceUpdateCallback = _.noop();
 
   // Public interface
@@ -67,9 +68,15 @@ var cashBalCtrl = (function () {
       if (_.isNil(cashBalances[i])) {
         return '';
       }
-      return (Math.round(cashBalances[i]) < 0 ? '-' : '') + (_.get(options, 'inBaseCurrency') ?
-          base_currency_symbol + Math.round(Math.abs(cashBalancesInBaseCurrency[i])).toLocaleString() :
-          currencySymbols[i] + Math.round(Math.abs(cashBalances[i])).toLocaleString());
+      var cashBalString = Math.round(cashBalances[i]) < 0 ? '-' : '';
+      if (_.get(options, 'inBaseCurrency')) {
+        cashBalString += _.get(options, 'withCurrencySymbol') ? base_currency_symbol : '';
+        cashBalString += Math.round(Math.abs(cashBalancesInBaseCurrency[i])).toLocaleString();
+      } else {
+        cashBalString += _.get(options, 'withCurrencySymbol') ? currencySymbols[i] : '';
+        cashBalString += Math.round(Math.abs(cashBalances[i])).toLocaleString();
+      }
+      return cashBalString;
     },
 
     updateBalances: function(transaction) {
@@ -78,6 +85,10 @@ var cashBalCtrl = (function () {
         setCashBalance(i, _.defaultTo(cashBalances[i], 0) + transaction.netSettlementAmount);
       });
       cashBalanceUpdateCallback(ids);
+    },
+
+    onNewTransaction: function(callback) {
+      newTransactionCallback = callback;
     },
 
     onCashBalanceUpdate: function(callback) {
@@ -172,15 +183,8 @@ var cashBalCtrl = (function () {
     socket.emit('subscribe', 'message-from-server');
     socket.on('connect', function () {
       socket.on('message-from-server', function (data) {
-        var transaction = data.transaction;
-        // Update the transaction amount
-        $('#transaction-amount').text(transaction.netSettlementAmount);
-        // Update the transaction currency
-        $('#transaction-currency').text(transaction.settlementCurrency);
-        // Update the transaction date and time
-        $('#transaction-date').text(transaction.receivedDateAndTime);
-
-        controller.updateBalances(transaction);
+        newTransactionCallback(data.transaction);
+        controller.updateBalances(data.transaction);
       });
     });
   }

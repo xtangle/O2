@@ -20,7 +20,7 @@ var hoveredId;
 // Globe setup
 
 // Set base currency header in cash balance table
-$('#cash-balance-table').find('.base-currency-header')
+$('#cash-balance-table').find('.base-currency-header span')
   .text('Cash Balance (' + cashBalCtrl.getBaseCurrencyCode() + ')');
 
 // Setting projection
@@ -58,7 +58,9 @@ function ready(error, world) {
     throw error;
   }
 
-  // Initialize DOM
+  // ================================================================
+  // Initializing the DOM and registering cash balance controller events
+
   var animateCheckbox = $('#animate');
   animateCheckbox.prop('checked', animate);
   animateCheckbox.on('click', function () {
@@ -67,6 +69,13 @@ function ready(error, world) {
     } else {
       startAnimation();
     }
+  });
+
+  // Update transaction table when a new transaction is received
+  cashBalCtrl.onNewTransaction(function (transaction) {
+    $('#transaction-amount').text(Math.round(transaction.netSettlementAmount).toLocaleString());
+    $('#transaction-currency').text(transaction.settlementCurrency);
+    $('#transaction-date').text(transaction.receivedDateAndTime);
   });
 
   // Re-color the affected countries, update the tooltip, and the cash balances table when cash balance is updated
@@ -183,8 +192,8 @@ function ready(error, world) {
 
   function updateCashBalanceTable(id) {
     var currencyCode = cashBalCtrl.getCurrencyCodes()[id];
-    var cashBalance = Math.round(cashBalCtrl.getCashBalances()[id]);
-    var cashBalanceInBaseCurrency = Math.round(cashBalCtrl.getCashBalancesInBaseCurrency()[id]);
+    var cashBalance = cashBalCtrl.getCashBalanceString(id);
+    var cashBalanceInBaseCurrency = cashBalCtrl.getCashBalanceString(id, {inBaseCurrency: true});
 
     var cashBalanceTable = $('#cash-balance-table');
     var currencyRow = cashBalanceTable.find('tr td:first-child:contains(' + currencyCode + ')').parent();
@@ -195,16 +204,18 @@ function ready(error, world) {
     } else {
       cashBalanceTable.find('tr:last').after($('<tr>')
         .append($('<td>')
-          .addClass('bold col-md-3')
+          .addClass('bold')
           .text(currencyCode))
         .append($('<td>')
           .addClass('cash-balance')
-          .append($('<span>'))
-          .text(cashBalance))
+          .css('text-align', 'right')
+          .append($('<span>')
+            .text(cashBalance)))
         .append($('<td>')
           .addClass('cash-balance-base-currency')
-          .append($('<span>'))
-          .text(cashBalanceInBaseCurrency))
+          .css('text-align', 'right')
+          .append($('<span>')
+            .text(cashBalanceInBaseCurrency)))
       );
     }
   }
@@ -263,9 +274,12 @@ function ready(error, world) {
   }
 
   function getAmountString(i) {
-    var amountString = cashBalCtrl.getCashBalanceString(i);
+    var amountString = cashBalCtrl.getCashBalanceString(i, {withCurrencySymbol: true});
     if (cashBalCtrl.hasCashBalance(i) && !cashBalCtrl.isInBaseCurrency(i)) {
-      amountString += ' (' + cashBalCtrl.getCashBalanceString(i, {inBaseCurrency: true}) + ')';
+      amountString += ' (' + cashBalCtrl.getCashBalanceString(i, {
+          withCurrencySymbol: true,
+          inBaseCurrency: true
+        }) + ')';
     }
     return amountString;
   }
