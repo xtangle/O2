@@ -1,40 +1,20 @@
 // globe.js
-// Dependencies: jquery, lodash, socket.io, d3, d3.topojson, d3.queue
-
-// Socket.io
-var socket = io();
-socket.emit('subscribe', 'message-from-server');
-socket.on('connect', function () {
-  socket.on('message-from-server', function (data) {
-    // Update the transaction amount
-    $('#transaction-amount').text(data.transaction.netSettlementAmount);
-    // Update the transaction currency
-    $('#transaction-currency').text(data.transaction.settlementCurrency);
-    // Update the transaction date and time
-    $('#transaction-date').text(data.transaction.receivedDateAndTime);
-
-    mainController.updateBal(data.transaction.settlementCurrency,data.transaction.netSettlementAmount);
-  });
-});
+// Dependencies: jquery, lodash, socket.io, d3, d3.topojson, d3.queue, cashBalanceController.js
 
 // ================================================================
 // Parameter definitions
-
-// Cash balance parameters
-const base_currency_code = 'EUR', base_currency_symbol = '€';
-const conversion_rate_resource_url = '//api.fixer.io/latest?base=' + base_currency_code;
-const conversion_rate_update_period_in_ms = 60000;
-const cash_danger = -10000, cash_warn = -1000, cash_zero = 0, cash_ok = 100000, cash_excess = 1000000;
 
 // Globe parameters
 const width = 600, height = 600;
 const sens_0 = 0.25, sens_adjust = 0.2;
 const scale_0 = 300, scale_min = 150, scale_max = 1200;
 const rot_v_lambda = 0.18, rot_v_phi = 0, rot_v_gamma = 0;
+const cash_bal_danger = -10000, cash_bal_warn = -1000, cash_bal_zero = 0, cash_bal_ok = 100000, cash_bal_excess = 1000000;
 
 var sens = sens_0;
 var focused = false;
 var doRotate = true;
+var hoveredId;
 
 // ================================================================
 // Globe setup
@@ -61,77 +41,44 @@ svg.append('path')
   .attr('d', path);
 
 var countryTooltip = d3.select('body').append('div').attr('class', 'countryTooltip');
-var countryList = d3.select('body').append('select').attr({
-  name: 'countries',
-  class: 'countryDropdown'
-});
 
 queue()
   .defer(d3.json, 'globe/world-110m-withlakes.json')
-  .defer(d3.tsv, 'globe/world-110m-country-currency-data.tsv')
-  .defer(d3.json, conversion_rate_resource_url)
+  .defer(cashBalCtrl.init)
   .await(ready);
 
 // ================================================================
 // Main function
-function ready(error, world, countryCurrencyData, conversionRatesData) {
+function ready(error, world) {
   if (error) {
     throw error;
   }
 
-  // ================================================================
-  // Initializing data
-
-  var countryNames = {};
-  var currencyNames = {};
-  var currencyCodes = {};
-  var currencySymbols = {};
-  var cashBalances = {}; // Non-normalized cash balance amounts
-  var conversionRates = conversionRatesData.rates;
-
-  var countries = topojson.feature(world, world.objects.countries).features;
-  var lakes = topojson.feature(world, world.objects.ne_110m_lakes).features;
-
-  // Initialize data and adding countries to select
-  countryCurrencyData.forEach(function (d) {
-    countryNames[d.id] = d.name;
-    currencyNames[d.id] = d.currency_name;
-    currencyCodes[d.id] = d.currency_code;
-    currencySymbols[d.id] = d.currency_symbol;
-
-    var option = countryList.append('option');
-    option.text(d.name);
-    option.property('value', d.id);
+  // Re-color the affected countries, update the tooltip, and the cash balances table when cash balance is updated
+  cashBalCtrl.onCashBalanceUpdate(function (ids) {
+    var color = cashBalanceToColor(cashBalCtrl.getCashBalancesInBaseCurrency()[ids[0]]);
+    ids.forEach(function (id) {
+      svg.selectAll('path#country-' + id)
+        .style('fill', color);
+    });
+    updateCashBalanceTable(ids[0]);
+    updateTooltipText();
   });
-
-  // Initialize cash balances (for testing)
-  (function initializeCashBalances() {
-    function setCashBalancesForCurrency(currencyCode, cashBalance) {
-      indicesOf(currencyCodes, currencyCode).forEach(function (i) {
-        cashBalances[i] = cashBalance;
-      });
-    }
-    setCashBalancesForCurrency('CAD', cadInitBal);
-    setCashBalancesForCurrency('USD', usdInitBal);
-    setCashBalancesForCurrency('INR', -80000);
-    setCashBalancesForCurrency('EUR', eurInitBal);
-    setCashBalancesForCurrency('GBP', 700000);
-    setCashBalancesForCurrency('CNY', 0);
-    setCashBalancesForCurrency('JPY', -50000);
-  })();
 
   // ================================================================
   // Initializing the globe
 
+  var countries = topojson.feature(world, world.objects.countries).features;
+  var lakes = topojson.feature(world, world.objects.ne_110m_lakes).features;
+
   // Draw countries on the globe
   countries.forEach(function (d) {
-    var cashBalance = cashBalances[d.id];
-    var currencyCode = currencyCodes[d.id];
-    var normalizedCashBalance = getNormalizedCashBalance(cashBalance, currencyCode);
-    var color = cashBalanceToColor(normalizedCashBalance);
-    svg.selectAll('path#country-' + d.id)
+    var color = cashBalanceToColor(cashBalCtrl.getCashBalancesInBaseCurrency()[d.id]);
+    var idAttr = 'country-' + d.id;
+    svg.selectAll('path#' + idAttr)
       .data([d])
       .enter().append('path')
+      .attr('id', idAttr)
       .attr('class', 'land')
       .attr('d', path)
       .style('fill', color);
@@ -147,21 +94,20 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
   // Register mouse events when on land
   svg.selectAll('path.land')
     .on('mouseover', function (d) {
-      var cashBalance = cashBalances[d.id];
-      var currencySymbol = currencySymbols[d.id];
-      var currencyName = currencyNames[d.id];
-      var currencyCode = currencyCodes[d.id];
-      countryTooltip.text(countryNames[d.id] +
-        (_.isNil(cashBalance) || _.isNil(currencySymbol) ? '' : '\nAmount: ' + getAmountString(cashBalance, currencyCode, currencySymbol)) +
-        (_.isNil(currencyName) ? '' : '\nCurrency: ' + currencyName))
+      countryTooltip
         .style('left', (d3.event.pageX + 7) + 'px')
         .style('top', (d3.event.pageY - 15) + 'px')
-        .style('display', 'block')
+    })
+    .on('mouseenter', function (d) {
+      hoveredId = d.id;
+      updateTooltipText();
+      countryTooltip.style('display', 'block')
         .style('opacity', 1);
     })
     .on('mouseout', function (d) {
-      countryTooltip.style('opacity', 0)
-        .style('display', 'none');
+      hoveredId = null;
+      countryTooltip.style('display', 'none')
+        .style('opacity', 0);
     })
     .on('mousemove', function (d) {
       countryTooltip.style('left', (d3.event.pageX + 7) + 'px')
@@ -170,7 +116,7 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
 
   // Register globe events
   svg.selectAll('path')
-    // Drag event
+  // Drag event
     .call(d3.behavior.drag()
       .origin(function () {
         var r = projection.rotate();
@@ -195,55 +141,60 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
         refresh();
       }));
 
-  // Country focus on option select
-  d3.select('select').on('change', function () {
-    function country(cnt, sel) {
-      for (var i = 0, l = cnt.length; i < l; i++) {
-        if (cnt[i].id == sel.value) {
-          return cnt[i];
-        }
-      }
-    }
-
-    var rotate = projection.rotate();
-    var focusedCountry = country(countries, this);
-    var p = d3.geo.centroid(focusedCountry);
-    svg.selectAll('.focused').classed('focused', focused = false);
-
-    // Globe rotating to country
-    (function transition() {
-      d3.transition()
-        .duration(1500)
-        .tween('rotate', function () {
-          var r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
-          return function (t) {
-            projection.rotate(r(t));
-            svg.selectAll('path').attr('d', path)
-              .classed('focused', function (d, i) {
-                return d.id == focusedCountry.id ? focused = d : false;
-              });
-          };
-        })
-    })();
-  });
-
-  startAnimation(false);
-  startUpdatingConversionRates();
-
   // ================================================================
   // Common globe functions
 
-  // Refresh drawing of the globe
+  // Redraw paths on the globe
   function refresh() {
     svg.selectAll('path.land').attr('d', path);
     svg.selectAll('path.water').attr('d', path);
     svg.selectAll('path.lake').attr('d', path);
   }
 
-  // Start animating the rotation of the globe
-  function startAnimation(autoRoate) {
-    doRotate = autoRoate;
-    d3.timer(function() {
+  // Update tooltip text
+  function updateTooltipText() {
+    if (!_.isNil(hoveredId)) {
+      var currencyName = cashBalCtrl.getCurrencyNames()[hoveredId];
+      var amountString = getAmountString(hoveredId);
+      countryTooltip.text(cashBalCtrl.getCountryNames()[hoveredId] +
+        (amountString === '' ? '' : '\nAmount: ' + amountString) +
+        (_.isNil(currencyName) ? '' : '\nCurrency: ' + currencyName));
+    }
+  }
+
+  function updateCashBalanceTable(id) {
+    var currencyCode = cashBalCtrl.getCurrencyCodes()[id];
+    var cashBalance = Math.round(cashBalCtrl.getCashBalances()[id]);
+    var cashBalanceInBaseCurrency = Math.round(cashBalCtrl.getCashBalancesInBaseCurrency()[id]);
+
+    var cashBalanceTable = $('#cash-balance-table');
+    var currencyRow = cashBalanceTable.find('tr td:first-child:contains(' + currencyCode + ')').parent();
+
+    if (currencyRow.length > 0) {
+      console.log(currencyRow);
+      currencyRow.find('.cash-balance').text(cashBalance);
+      currencyRow.find('.cash-balance-base-currency').text(cashBalanceInBaseCurrency);
+    } else {
+      cashBalanceTable.find('tr:last').after($('<tr>')
+        .append($('<td>')
+          .addClass('bold col-md-3')
+          .text(currencyCode))
+        .append($('<td>')
+          .addClass('cash-balance')
+          .append($('<span>'))
+          .text(cashBalance))
+        .append($('<td>')
+          .addClass('cash-balance-base-currency')
+          .append($('<span>'))
+          .text(cashBalanceInBaseCurrency))
+      );
+    }
+  }
+
+  // Start/stop animating the rotation of the globe
+  function startAnimation() {
+    doRotate = true;
+    d3.timer(function () {
       var rotate = projection.rotate();
       projection.rotate([rotate[0] + rot_v_lambda, rotate[1] + rot_v_phi, rotate[2] + rot_v_gamma]);
       refresh();
@@ -256,93 +207,47 @@ function ready(error, world, countryCurrencyData, conversionRatesData) {
     refresh();
   }
 
-  // Periodically retrieve the latest conversion rates
-  function startUpdatingConversionRates() {
-    setTimeout(function () {
-      // The random number appended to the url is to prevent caching
-      var rand = Math.floor(Math.random() * 1000000);
-      d3.json(conversion_rate_resource_url + '&rand' + rand, function (data) {
-        conversionRatesData = data;
-        conversionRates = conversionRatesData.rates;
-        startUpdatingConversionRates();
-      });
-    }, conversion_rate_update_period_in_ms);
-  }
-
   // ================================================================
   // Helper functions
-
-  function indicesOf(obj, value) {
-    return _.keys(obj).filter(function (k) {
-      return obj[k] === value;
-    });
-  }
 
   function cashBalanceToColor(cashBalance) {
     var r, g, b, f;
     if (_.isNil(cashBalance)) {
       return '#333333';
-    } else if (cashBalance < cash_danger) {
+    } else if (cashBalance < cash_bal_danger) {
       r = 255;
       g = 0;
       b = 0;
-    } else if (cashBalance < cash_warn) {
-      f = Math.min(1, (cashBalance - cash_warn) / (cash_danger - cash_warn));
+    } else if (cashBalance < cash_bal_warn) {
+      f = Math.min(1, (cashBalance - cash_bal_warn) / (cash_bal_danger - cash_bal_warn));
       r = 255;
       g = 127 - Math.floor(127 * f);
       b = 0;
-    } else if (cashBalance < cash_zero) {
-      f = Math.min(1, (cashBalance - cash_zero) / (cash_warn - cash_zero));
+    } else if (cashBalance < cash_bal_zero) {
+      f = Math.min(1, (cashBalance - cash_bal_zero) / (cash_bal_warn - cash_bal_zero));
       r = 255;
       g = 255 - Math.floor(128 * f);
       b = 0;
-    } else if (cashBalance < cash_ok) {
-      f = Math.min(1, (cashBalance - cash_zero) / (cash_ok - cash_zero));
+    } else if (cashBalance < cash_bal_ok) {
+      f = Math.min(1, (cashBalance - cash_bal_zero) / (cash_bal_ok - cash_bal_zero));
       r = 255 - Math.floor(255 * Math.sqrt(f));
       g = 255;
       b = 0;
     } else {
-      f = Math.min(1, (cashBalance - cash_ok) / (cash_excess - cash_ok));
+      f = Math.min(1, (cashBalance - cash_bal_ok) / (cash_bal_excess - cash_bal_ok));
       r = 0;
       g = 255;
       b = Math.floor(255 * f);
     }
-    return '#' + [r, g, b].map(function(c) {
-      return _.padStart(c.toString(16).toUpperCase(), 2, '0');
-    }).join('');
+    return '#' + [r, g, b].map(function (c) {
+        return _.padStart(c.toString(16).toUpperCase(), 2, '0');
+      }).join('');
   }
 
-  // $('.countryDropdown option[value="124"]').attr('selected','selected').trigger('change');
-  $('.countryDropdown').val(124).trigger('change');
-  function getNormalizedCashBalance(cashBalance, currencyCode) {
-    if (_.isNil(cashBalance) || _.isNil(currencyCode)) {
-      return null;
-    } else if (currencyCode === base_currency_code) {
-      return cashBalance;
-    } else {
-      return Math.round(cashBalance / conversionRates[currencyCode]);
-    }
-  }
-
-  function getAmountString(cashBalance, currencyCode, currencySymbol) {
-    var amountString = '';
-    var displayBaseCurrency = (currencyCode !== base_currency_code);
-    var normalizedCashBalance;
-
-    if (displayBaseCurrency) {
-      normalizedCashBalance = getNormalizedCashBalance(cashBalance, currencyCode);
-    }
-
-    if (cashBalance < 0) {
-      amountString += '-' + currencySymbol + (-cashBalance).toLocaleString() + ' ' + currencyCode;
-      if (displayBaseCurrency) {
-        amountString += ' (-' + base_currency_symbol + (-normalizedCashBalance).toLocaleString() + ' ' + base_currency_code + ')';
-      }
-    } else {
-      amountString += currencySymbol + cashBalance.toLocaleString() + ' ' + currencyCode;
-      if (displayBaseCurrency) {
-        amountString += ' (' + base_currency_symbol + normalizedCashBalance.toLocaleString() + ' ' + base_currency_code + ')';
-      }
+  function getAmountString(i) {
+    var amountString = cashBalCtrl.getCashBalanceString(i);
+    if (cashBalCtrl.hasCashBalance(i) && !cashBalCtrl.isInBaseCurrency(i)) {
+      amountString += ' (' + cashBalCtrl.getCashBalanceString(i, {inBaseCurrency: true}) + ')';
     }
     return amountString;
   }

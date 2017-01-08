@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="globe/globe.css">
 
   <script type="text/javascript" src="lib/jquery.js"></script>
-  <script type="text/javascript" src="js/mainController.js"></script>
   <script type="text/javascript" src="lib/lodash.min.js"></script>
   <script type='text/javascript' src='lib/socket.io.js'></script>
   <script type="text/javascript" src="lib/d3.v3.min.js"></script>
@@ -32,8 +31,8 @@
       </tr>
       <tr>
         <td><span id="transaction-amount"></span></td>
-        <td><span id="transaction-currency"></span> </td>
-        <td><span id="transaction-date"></span> </td>
+        <td><span id="transaction-currency"></span></td>
+        <td><span id="transaction-date"></span></td>
       </tr>
 
     </table>
@@ -48,27 +47,20 @@
       </div>
     </div>
     <div class="col-md-3 alignLeft">
-      <table class="table table-striped">
+      <table id="cash-balance-table" class="table table-striped">
         <tr>
-          <td colspan="2"><span class="bold tableTitle">CURRENT BALANCE</span></td>
-
+          <th colspan="3"><span class="bold tableTitle">CURRENT BALANCE</span></th>
         </tr>
         <tr>
-          <td class="bold col-md-3">CAD</td>
-          <td><span id="cadBal"></span> </td>
-        </tr>
-        <tr>
-          <td class="bold">USD</td>
-          <td><span id="usdBal"></span> </td>
-        </tr>
-        <tr>
-          <td class="bold">EUR</td>
-          <td><span id="eurBal"></span> </td>
+          <th><span>Currency</span></th>
+          <th><span>Balance</span></th>
+          <th><span>Balance (Euro)</span></th>
         </tr>
       </table>
     </div>
   </div>
 
+  <script type="text/javascript" src="js/cashBalanceController.js"></script>
   <script type="text/javascript" src="globe/globe.js"></script>
 </body>
 </html>

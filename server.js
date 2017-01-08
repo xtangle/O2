@@ -34,8 +34,8 @@ var io = require('socket.io')(server);
 io.on('connection', function(socket) {
   console.log('new connection made');
 
-  var currencies = ['CAD', 'USD', 'EUR'];
-  var minAmount = 1000, maxAmount = 10000;
+  var currencies = ['CAD', 'USD', 'EUR', 'GBP', 'CNY', 'JPY', 'INR', 'AUD'];
+  var minAmount = 1000, maxAmount = 100000;
 
   function getRandomCurrency() {
     return currencies[Math.floor(Math.random() * currencies.length)];
@@ -55,7 +55,7 @@ io.on('connection', function(socket) {
         receivedDateAndTime: moment().format()
       }
     });
-  }, 2000);
+  }, 1000);
 });
 
 // start server on the specified port and binding host
