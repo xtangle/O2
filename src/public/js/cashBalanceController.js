@@ -58,6 +58,8 @@ var cashBalCtrl = (function () {
     getCurrencySymbols: function() { return currencySymbols; },
     getConversionRates: function() { return conversionRates; },
 
+    getBaseCurrencyCode: function() { return base_currency_code; },
+    getBaseCurrencySymbol: function() { return base_currency_symbol; },
     hasCashBalance: function(i) { return !_.isNil(cashBalances[i]); },
     isInBaseCurrency: function(i) { return currencyCodes[i] === base_currency_code; },
 

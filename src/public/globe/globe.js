@@ -19,6 +19,10 @@ var hoveredId;
 // ================================================================
 // Globe setup
 
+// Set base currency header in cash balance table
+$('#cash-balance-table').find('.base-currency-header')
+  .text('Cash Balance (' + cashBalCtrl.getBaseCurrencyCode() + ')');
+
 // Setting projection
 var projection = d3.geo.orthographic()
   .scale(scale_0)
