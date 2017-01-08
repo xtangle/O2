@@ -95,7 +95,6 @@ function ready(error, world) {
   // Initializing the globe
 
 
-
   var countries = topojson.feature(world, world.objects.countries).features;
   var lakes = topojson.feature(world, world.objects.ne_110m_lakes).features;
 
@@ -226,17 +225,19 @@ function ready(error, world) {
         // Default sort
         sortList: [[2, 1]],
         // Remove commas from the string
-        textExtraction: function(node) {
+        textExtraction: function (node) {
           return node.innerHTML.replace(/,/g, '');
         }
       });
       tableSorterInitialized = true;
     }
 
-    // Update sorting on the table
     cashBalanceTable.trigger('update');
-    var sorting = cashBalanceTable.get(0).config.sortList;
-    cashBalanceTable.trigger('sorton', [sorting]);
+    setTimeout(function () {
+      // Sort the table again (after some delay so that the table contains the new balances)
+      var sorting = cashBalanceTable.get(0).config.sortList;
+      cashBalanceTable.trigger('sorton', [sorting]);
+    }, 10);
   }
 
   // Start/stop animating the rotation of the globe

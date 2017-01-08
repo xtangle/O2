@@ -25,7 +25,7 @@ var cashBalCtrl = (function () {
   // Public interface
   const controller = {
     init: function (callback) {
-      getCountryCurrencyData().then(function(data) {
+      getCountryCurrencyData().then(function (data) {
         data.forEach(function (d) {
           countryNames[d.id] = d.name;
           currencyNames[d.id] = d.currency_name;
@@ -33,7 +33,7 @@ var cashBalCtrl = (function () {
           currencySymbols[d.id] = d.currency_symbol;
         });
         return getConversionRates();
-      }).then(function(rates) {
+      }).then(function (rates) {
         conversionRates = rates;
 
         // Initialize cash balances, for now set to false
@@ -51,20 +51,42 @@ var cashBalCtrl = (function () {
       });
     },
 
-    getCountryNames: function() { return countryNames; },
-    getCashBalances: function() { return cashBalances; },
-    getCashBalancesInBaseCurrency: function() { return cashBalancesInBaseCurrency; },
-    getCurrencyNames: function() { return currencyNames; },
-    getCurrencyCodes: function() { return currencyCodes; },
-    getCurrencySymbols: function() { return currencySymbols; },
-    getConversionRates: function() { return conversionRates; },
+    getCountryNames: function () {
+      return countryNames;
+    },
+    getCashBalances: function () {
+      return cashBalances;
+    },
+    getCashBalancesInBaseCurrency: function () {
+      return cashBalancesInBaseCurrency;
+    },
+    getCurrencyNames: function () {
+      return currencyNames;
+    },
+    getCurrencyCodes: function () {
+      return currencyCodes;
+    },
+    getCurrencySymbols: function () {
+      return currencySymbols;
+    },
+    getConversionRates: function () {
+      return conversionRates;
+    },
 
-    getBaseCurrencyCode: function() { return base_currency_code; },
-    getBaseCurrencySymbol: function() { return base_currency_symbol; },
-    hasCashBalance: function(i) { return !_.isNil(cashBalances[i]); },
-    isInBaseCurrency: function(i) { return currencyCodes[i] === base_currency_code; },
+    getBaseCurrencyCode: function () {
+      return base_currency_code;
+    },
+    getBaseCurrencySymbol: function () {
+      return base_currency_symbol;
+    },
+    hasCashBalance: function (i) {
+      return !_.isNil(cashBalances[i]);
+    },
+    isInBaseCurrency: function (i) {
+      return currencyCodes[i] === base_currency_code;
+    },
 
-    getCashBalanceString: function(i, options) {
+    getCashBalanceString: function (i, options) {
       if (_.isNil(cashBalances[i])) {
         return '';
       }
@@ -79,7 +101,7 @@ var cashBalCtrl = (function () {
       return cashBalString;
     },
 
-    updateBalances: function(transaction) {
+    updateBalances: function (transaction) {
       var ids = indicesOf(currencyCodes, transaction.settlementCurrency);
       ids.forEach(function (i) {
         setCashBalance(i, _.defaultTo(cashBalances[i], 0) + transaction.netSettlementAmount);
@@ -87,11 +109,11 @@ var cashBalCtrl = (function () {
       cashBalanceUpdateCallback(ids);
     },
 
-    onNewTransaction: function(callback) {
+    onNewTransaction: function (callback) {
       newTransactionCallback = callback;
     },
 
-    onCashBalanceUpdate: function(callback) {
+    onCashBalanceUpdate: function (callback) {
       cashBalanceUpdateCallback = callback;
     }
   };
@@ -142,8 +164,8 @@ var cashBalCtrl = (function () {
   }
 
   function getCountryCurrencyData() {
-    return new Promise(function(resolve, reject) {
-      d3.tsv(country_currency_data_file, function(error, data) {
+    return new Promise(function (resolve, reject) {
+      d3.tsv(country_currency_data_file, function (error, data) {
         if (error) {
           reject(error);
         } else {
@@ -154,7 +176,7 @@ var cashBalCtrl = (function () {
   }
 
   function getConversionRates() {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       // The random number appended to the url is to prevent caching
       var rand = Math.floor(Math.random() * 1000000);
       d3.json(conversion_rate_resource_url + '&r' + rand, function (error, data) {
