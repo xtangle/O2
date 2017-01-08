@@ -35,11 +35,14 @@ var cashBalCtrl = (function () {
       }).then(function(rates) {
         conversionRates = rates;
 
-        var initialBalances = [['CAD', 100000], ['USD', 100000], ['INR', -80000], ['EUR', 100000],
-          ['GBP', 70000], ['CNY', 0], ['JPY', -5000], ['AUD', 250000]];
-        initialBalances.map(function (p) {
-          setCashBalancesForCurrency(p[0], p[1], {inBaseCurrency: true});
-        });
+        // Initialize cash balances, for now set to false
+        if (false) {
+          var initialBalances = [['CAD', 100000], ['USD', 100000], ['INR', -80000], ['EUR', 100000],
+            ['GBP', 70000], ['CNY', 0], ['JPY', -5000], ['AUD', 250000]];
+          initialBalances.map(function (p) {
+            setCashBalancesForCurrency(p[0], p[1], {inBaseCurrency: true});
+          });
+        }
 
         initializeSocketConnection();
         startUpdatingConversionRates();
