@@ -4,6 +4,8 @@
 // ================================================================
 // Parameter definitions
 
+const base_url = location.protocol + '//' + location.hostname + (location.port && ':' + location.port) + '/';
+
 // Globe parameters
 const width = 600, height = 600;
 const sens_0 = 0.25, sens_adjust = 0.2;
@@ -20,6 +22,7 @@ var focused = false;
 var animate = true;
 var hoveredId;
 var tableSorterInitialized = false;
+var dragged = false;
 
 // ================================================================
 // Globe setup
@@ -142,6 +145,14 @@ function ready(error, world) {
     .on('mousemove', function (d) {
       countryTooltip.style('left', (d3.event.pageX + 7) + 'px')
         .style('top', (d3.event.pageY - 15) + 'px');
+    })
+    .on('mousedown', function (d) {
+      dragged = false;
+    })
+    .on('click', function (d) {
+      if (!dragged && cashBalCtrl.hasCashBalance(d.id)) {
+        openTransactionSummaryPage(d.id);
+      }
     });
 
   // Register globe events
@@ -153,6 +164,7 @@ function ready(error, world) {
         return {x: r[0] / sens, y: -r[1] / sens};
       })
       .on('drag', function () {
+        dragged = true;
         var rotate = projection.rotate();
         var lambda = d3.event.x * sens;
         var phi = -d3.event.y * sens;
@@ -208,13 +220,15 @@ function ready(error, world) {
     var cashBalance = cashBalCtrl.getCashBalanceString(id);
     var cashBalanceInBaseCurrency = cashBalCtrl.getCashBalanceString(id, {inBaseCurrency: true});
 
-    var currencyRow = cashBalanceTable.find('tbody tr td:first-child:contains(' + currencyCode + ')').parent();
+    var rowClass = 'cash-balance-row-' + currencyCode;
+    var currencyRow = cashBalanceTable.find('tbody tr.' + rowClass);
 
     if (currencyRow.length > 0) {
       currencyRow.find('.cash-balance').text(cashBalance);
       currencyRow.find('.cash-balance-base-currency').text(cashBalanceInBaseCurrency);
     } else {
-      cashBalanceTable.find('tbody').append($('<tr>')
+      currencyRow = $('<tr>')
+        .addClass(rowClass)
         .append($('<td>')
           .addClass('bold')
           .text(currencyCode))
@@ -225,8 +239,11 @@ function ready(error, world) {
         .append($('<td>')
           .addClass('cash-balance-base-currency')
           .css('text-align', 'right')
-          .text(cashBalanceInBaseCurrency))
-      );
+          .text(cashBalanceInBaseCurrency));
+      cashBalanceTable.find('tbody').append(currencyRow);
+      cashBalanceTable.on('click', 'tr.' + rowClass, function() {
+        openTransactionSummaryPage(id);
+      });
     }
 
     if (!tableSorterInitialized) {
@@ -264,6 +281,13 @@ function ready(error, world) {
   function stopAnimation() {
     animate = false;
     refresh();
+  }
+
+  // Open transaction summary page for given currency id
+  function openTransactionSummaryPage(id) {
+    var currencyCode = cashBalCtrl.getCurrencyCodes()[id];
+    var url = base_url + 'transactions?curr=' + currencyCode;
+    window.open(url);
   }
 
   // ================================================================
