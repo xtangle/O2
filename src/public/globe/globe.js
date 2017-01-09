@@ -5,7 +5,7 @@
 // Parameter definitions
 
 // Globe parameters
-const width = 600, height = 600;
+const width = 700, height = 600;
 const sens_0 = 0.25, sens_adjust = 0.2;
 const scale_0 = 300, scale_min = 150, scale_max = 1200;
 
