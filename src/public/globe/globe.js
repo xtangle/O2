@@ -62,7 +62,7 @@ cashBalanceTable.find('.base-currency-header')
 cashBalCtrl.onGetConversionRates(function (data) {
   // Using fixer.io, rates are updated daily at around 4PM CET every weekday
   var utcTimestamp = moment.utc(data.date, 'YYYY-MM-DD').hour(16);
-  $('#conversion-rate-timestamp').text(utcTimestamp.local().format('LLL'));
+  $('#conversion-rate-timestamp').text(utcTimestamp.local().format('LLL Z'));
 });
 
 $('#conversion-rate-source').attr('href', cashBalCtrl.getConversionRateSource());
