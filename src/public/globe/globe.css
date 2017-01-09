@@ -64,6 +64,14 @@
   white-space: pre-wrap;
 }
 
+.color-legend-caption {
+  white-space: nowrap;
+}
+
+.color-legend-label {
+  width: 40px;
+}
+
 table.tablesorter th {
   cursor: pointer;
 }
