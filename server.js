@@ -81,15 +81,23 @@ io.on('connection', function (socket) {
     return sign * amount;
   }
 
-  var autoEmit = setInterval(function () {
-    socket.emit('message-from-server', {
-      transaction: {
-        settlementCurrency: getRandomCurrency(),
-        netSettlementAmount: getRandomAmount(),
-        receivedDateAndTime: moment().format()
-      }
-    });
-  }, 1000);
+  function getRandomTime() {
+    return Math.floor((Math.random() * 1500) + 500);
+  }
+
+  (function autoEmit() {
+    setTimeout(function () {
+      socket.emit('message-from-server', {
+        transaction: {
+          settlementCurrency: getRandomCurrency(),
+          netSettlementAmount: getRandomAmount(),
+          receivedDateAndTime: moment().format()
+        }
+      });
+      autoEmit();
+    }, getRandomTime());
+  })();
+
 });
 
 // start server on the specified port and binding host
