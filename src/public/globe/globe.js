@@ -22,7 +22,7 @@ var focused = false;
 var animate = true;
 var hoveredId;
 var tableSorterInitialized = false;
-var dragged = false;
+var hasDragged = false;
 
 // ================================================================
 // Globe setup
@@ -147,10 +147,10 @@ function ready(error, world) {
         .style('top', (d3.event.pageY - 15) + 'px');
     })
     .on('mousedown', function (d) {
-      dragged = false;
+      hasDragged = false;
     })
-    .on('click', function (d) {
-      if (!dragged && cashBalCtrl.hasCashBalance(d.id)) {
+    .on('mouseup', function (d) {
+      if (!hasDragged && cashBalCtrl.hasCashBalance(d.id)) {
         openTransactionSummaryPage(d.id);
       }
     });
@@ -164,7 +164,7 @@ function ready(error, world) {
         return {x: r[0] / sens, y: -r[1] / sens};
       })
       .on('drag', function () {
-        dragged = true;
+        hasDragged = true;
         var rotate = projection.rotate();
         var lambda = d3.event.x * sens;
         var phi = -d3.event.y * sens;
