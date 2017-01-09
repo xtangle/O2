@@ -101,11 +101,6 @@ var cashBalCtrl = (function () {
       return cashBalString;
     },
 
-    getCashBalanceForCurrency: function (currencyCode, options) {
-      var id = _.findKey(currencyCodes, function(c) { return c === currencyCode; });
-      return _.get(options, 'inBaseCurrency') ? cashBalancesInBaseCurrency[id] : cashBalances[id];
-    },
-
     updateBalances: function (transaction) {
       var ids = indicesOf(currencyCodes, transaction.settlementCurrency);
       ids.forEach(function (i) {

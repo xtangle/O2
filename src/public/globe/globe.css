@@ -38,6 +38,7 @@
 .land {
   stroke: #FFF;
   stroke-width: 0.75px;
+  transition: fill 1s ease;
 }
 
 .land:hover {

@@ -16,7 +16,6 @@ const rot_phi_limit = 90;
 const rot_v_lambda = -0.2, rot_v_phi = 0, rot_v_gamma = 0;
 
 const cash_bal_danger = -100000, cash_bal_warn = -10000, cash_bal_zero = 0, cash_bal_ok = 100000, cash_bal_excess = 1000000;
-const color_trans_time_in_ms = 1000, color_trans_freq = 100;
 
 var sens = sens_0;
 var focused = false;
@@ -24,8 +23,6 @@ var animate = true;
 var hoveredId;
 var tableSorterInitialized = false;
 var hasDragged = false;
-
-var lastBalanceBeforeUpdate;
 
 // ================================================================
 // Globe setup
@@ -88,10 +85,6 @@ function ready(error, world) {
     $('#transaction-amount').text(Math.round(transaction.netSettlementAmount).toLocaleString());
     $('#transaction-currency').text(transaction.settlementCurrency);
     $('#transaction-date').text(transaction.receivedDateAndTime);
-
-    // Record the old balance of the affected currency
-    lastBalanceBeforeUpdate = _.defaultTo(
-      cashBalCtrl.getCashBalanceForCurrency(transaction.settlementCurrency, {inBaseCurrency: true}), 0);
   });
 
   // Re-color the affected countries, update the tooltip, and the cash balances table when cash balance is updated
@@ -100,26 +93,11 @@ function ready(error, world) {
     updateTooltipText();
 
     // Color transition
-    var oldBalance = lastBalanceBeforeUpdate;
-    var newBalance = cashBalCtrl.getCashBalancesInBaseCurrency()[ids[0]];
-    var refreshPeriod = color_trans_time_in_ms / color_trans_freq;
-
-    var balanceIncr = (newBalance - oldBalance) / color_trans_freq;
-    var balances = _.range(oldBalance + balanceIncr, newBalance + balanceIncr, balanceIncr);
-    var countryElements = ids.map(function (id) {
-      return svg.selectAll('path#country-' + id);
+    var color = cashBalanceToColor(cashBalCtrl.getCashBalancesInBaseCurrency()[ids[0]]);
+    ids.forEach(function (id) {
+      svg.selectAll('path#country-' + id)
+        .style('fill', color);
     });
-
-    var i = 0;
-    var intervalId = setInterval(function () {
-      var color = cashBalanceToColor(balances[i]);
-      countryElements.forEach(function (elem) {
-        elem.style('fill', color);
-      });
-      if (++i === color_trans_freq) {
-        window.clearInterval(intervalId);
-      }
-    }, refreshPeriod);
   });
 
   // ================================================================
