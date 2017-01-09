@@ -22,7 +22,7 @@ app.get('/transactions', function (req, res) {
     .sort({Received_Date_and_Time: -1})
     .exec(function (err, transactions) {
       if (err) throw err;
-      res.end(
+      res.send(
         '<html>' +
         '<h1>Transactions in ' + currencyCode + '</h1>' +
         (transactions && transactions.length > 0
