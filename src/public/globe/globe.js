@@ -59,9 +59,10 @@ cashBalanceTable.find('.base-currency-header')
   .text('Cash Balance (' + cashBalCtrl.getBaseCurrencyCode() + ')');
 
 // Update conversion rate timestamp label, need to do this before calling cashBalCtrl.init
-cashBalCtrl.onGetConversionRates(function (updateTime) {
-  var momentTime = moment(updateTime);
-  $('#conversion-rate-timestamp').text(momentTime.format('LL LTS'));
+cashBalCtrl.onGetConversionRates(function (data) {
+  // Using fixer.io, rates are updated daily at around 4PM CET every weekday
+  var utcTimestamp = moment.utc(data.date, 'YYYY-MM-DD').hour(16);
+  $('#conversion-rate-timestamp').text(utcTimestamp.local().format('LLL'));
 });
 
 $('#conversion-rate-source').attr('href', cashBalCtrl.getConversionRateSource());

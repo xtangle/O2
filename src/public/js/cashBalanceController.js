@@ -188,7 +188,7 @@ var cashBalCtrl = (function () {
         if (error) {
           reject(error);
         } else {
-          getConversionRatesCallback(new Date());
+          getConversionRatesCallback(data);
           resolve(data.rates);
         }
       });
