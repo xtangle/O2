@@ -1,9 +1,10 @@
-var express = require('express');
-var path = require('path');
+const express = require('express');
+const path = require('path');
 // cfenv provides access to your Cloud Foundry environment, for info see: https://www.npmjs.com/package/cfenv
-var cfenv = require('cfenv');
-var connectionManager = require('./src/connection-manager');
-var moment = require('moment');
+const cfenv = require('cfenv');
+const connectionManager = require('./src/connection-manager');
+const moment = require('moment');
+const Transaction = require('./src/transaction/transaction-model');
 
 var app = express();
 var appEnv = cfenv.getAppEnv();
@@ -14,10 +15,37 @@ connectionManager.init();
 // serve the files out of ./public as our main files
 app.use(express.static(path.resolve(__dirname, 'src/public')));
 
+// serve transactions summary pages
+app.get('/transactions', function (req, res) {
+  var currencyCode = req.query.curr;
+  Transaction.find({Settlement_Currency: currencyCode})
+    .sort({Received_Date_and_Time: -1})
+    .exec(function (err, transactions) {
+      if (err) throw err;
+      res.end(
+        '<html>' +
+        '<h1>Transactions in ' + currencyCode + '</h1>' +
+        (transactions && transactions.length > 0
+            ?
+            '<ul>' +
+            transactions.map(function (t) {
+              return '<li>' +
+                'Amount: ' + t['Net_Settlement_Amount'] + ', ' +
+                'Date: ' + t['Received_Date_and_Time'] +
+                '</li>';
+            }).join('') +
+            '</ul>'
+            :
+            '<h3>No transactions found</h3>'
+        ) +
+        '</html>'
+      );
+    })
+});
+
 // serve our RESTful services
-var router = express.Router();
-router.get('/transactions', function (req, res) {
-  var Transaction = require('./src/transaction/transaction-model');
+var apiRouter = express.Router();
+apiRouter.get('/transactions', function (req, res) {
   Transaction.find({}, function (err, transactions) {
     if (err) throw err;
     res.json({
@@ -26,7 +54,7 @@ router.get('/transactions', function (req, res) {
     });
   });
 });
-app.use('/api', router);
+app.use('/api', apiRouter);
 
 // Socket.io
 var server = require('http').Server(app);
