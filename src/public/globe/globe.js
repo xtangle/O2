@@ -105,10 +105,7 @@ function ready(error, world) {
     var refreshPeriod = color_trans_time_in_ms / color_trans_freq;
 
     var balanceIncr = (newBalance - oldBalance) / color_trans_freq;
-    var balances = _.range(oldBalance, newBalance, balanceIncr)
-      .map(function (bal) {
-        return bal + balanceIncr;
-      });
+    var balances = _.range(oldBalance + balanceIncr, newBalance + balanceIncr, balanceIncr);
     var countryElements = ids.map(function (id) {
       return svg.selectAll('path#country-' + id);
     });
