@@ -45,10 +45,6 @@
   stroke-width: 1.5px;
 }
 
-.focused {
-  fill: #33CC33;
-}
-
 .animate-container {
   text-align: right;
   margin-right: 80px;

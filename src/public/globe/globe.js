@@ -9,15 +9,14 @@ const width = 600, height = 600;
 const sens_0 = 0.25, sens_adjust = 0.2;
 const scale_0 = 300, scale_min = 150, scale_max = 1200;
 
-const rot_lambda_0 = 90, rot_phi_0 = -20, rot_gamma_0 = 0;
+const rot_lambda_0 = 0, rot_phi_0 = 0, rot_gamma_0 = 0;
 const rot_phi_limit = 90;
 const rot_v_lambda = -0.2, rot_v_phi = 0, rot_v_gamma = 0;
 
 const cash_bal_danger = -100000, cash_bal_warn = -10000, cash_bal_zero = 0, cash_bal_ok = 100000, cash_bal_excess = 1000000;
 
 var sens = sens_0;
-var focused = false;
-var animate = true;
+var animate = false;
 var hoveredId;
 var tableSorterInitialized = false;
 var hasDragged = false;
@@ -154,7 +153,7 @@ function ready(error, world) {
     })
     .on('mouseup', function (d) {
       if (!hasDragged && cashBalCtrl.hasCashBalance(d.id)) {
-        openTransactionSummaryPage(d.id);
+        openTransactionSummaryPage(cashBalCtrl.getCurrencyCodes()[d.id]);
       }
     });
 
@@ -178,7 +177,6 @@ function ready(error, world) {
         }
         projection.rotate([lambda, phi, gamma]);
         refresh();
-        svg.selectAll('.focused').classed('focused', focused = false);
       }))
     // Zoom event
     .call(d3.behavior.zoom()
@@ -193,21 +191,32 @@ function ready(error, world) {
         refresh();
       }));
 
-  if (animate) {
-    startAnimation();
-  }
+  (function initializeGlobe() {
+    // Center on given country
+    var country = 'United States';
+    var id = _.findKey(cashBalCtrl.getCountryNames(), function (name) {return name === country});
+    var countryPath = _.find(countries, function (p) {return p.id == id});
+    var p = d3.geo.centroid(countryPath);
+    var rotate = projection.rotate();
+    projection.rotate([rotate[0] - p[0], rotate[1] - p[1], rotate[2]]);
+    refresh();
+
+    if (animate) {
+      startAnimation();
+    }
+  })();
 
   // ================================================================
-// Common globe functions
+  // Common globe functions
 
-// Redraw paths on the globe
+  // Redraw paths on the globe
   function refresh() {
     svg.selectAll('path.land').attr('d', path);
     svg.selectAll('path.water').attr('d', path);
     svg.selectAll('path.lake').attr('d', path);
   }
 
-// Update tooltip text
+  // Update tooltip text
   function updateTooltipText() {
     if (!_.isNil(hoveredId)) {
       var currencyName = cashBalCtrl.getCurrencyNames()[hoveredId];
@@ -274,7 +283,7 @@ function ready(error, world) {
     cashBalanceTable.find('tfoot .cash-balance-total').text(Math.round(totalBalance).toLocaleString());
   }
 
-// Start/stop animating the rotation of the globe
+  // Start/stop animating the rotation of the globe
   function startAnimation() {
     animate = true;
     d3.timer(function () {
@@ -290,7 +299,7 @@ function ready(error, world) {
     refresh();
   }
 
-// Open transaction summary page for given currency id
+  // Open transaction summary page for given currency id
   function openTransactionSummaryPage(currencyCode) {
     const base_url = location.protocol + '//' + location.hostname +
       (location.port && ':' + location.port) + '/';
@@ -298,8 +307,8 @@ function ready(error, world) {
     window.open(url);
   }
 
-// ================================================================
-// Helper functions
+  // ================================================================
+  // Helper functions
 
   function cashBalanceToColor(cashBalance) {
     var r, g, b, f;
