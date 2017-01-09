@@ -19,8 +19,9 @@ var cashBalCtrl = (function () {
   var currencySymbols = {};
   var conversionRates = {};
 
-  var newTransactionCallback = _.noop();
-  var cashBalanceUpdateCallback = _.noop();
+  var newTransactionCallback = _.noop;
+  var cashBalanceUpdateCallback = _.noop;
+  var getConversionRatesCallback = _.noop;
 
   // Public interface
   const controller = {
@@ -115,6 +116,10 @@ var cashBalCtrl = (function () {
 
     onCashBalanceUpdate: function (callback) {
       cashBalanceUpdateCallback = callback;
+    },
+
+    onGetConversionRates: function (callback) {
+      getConversionRatesCallback = callback;
     }
   };
 
@@ -130,15 +135,11 @@ var cashBalCtrl = (function () {
   }
 
   function convertToBaseCurrency(cashBalance, currencyCode) {
-    return convert(cashBalance, currencyCode, function (bal, rate) {
-      return bal / rate;
-    });
+    return convert(cashBalance, currencyCode, function (bal, rate) {return bal / rate;});
   }
 
   function convertToLocalCurrency(cashBalance, currencyCode) {
-    return convert(cashBalance, currencyCode, function (bal, rate) {
-      return bal * rate;
-    });
+    return convert(cashBalance, currencyCode, function (bal, rate) {return bal * rate;});
   }
 
   function indicesOf(obj, value) {
@@ -183,6 +184,7 @@ var cashBalCtrl = (function () {
         if (error) {
           reject(error);
         } else {
+          getConversionRatesCallback(new Date());
           resolve(data.rates);
         }
       });
@@ -194,6 +196,10 @@ var cashBalCtrl = (function () {
     setTimeout(function () {
       getConversionRates().then(function (rates) {
         conversionRates = rates;
+        // Re-calculate all cash balances in base currency
+        _.forOwn(cashBalances, function (bal, id) {
+          cashBalancesInBaseCurrency[id] = convertToBaseCurrency(bal, currencyCodes[id]);
+        });
         startUpdatingConversionRates();
       });
     }, conversion_rate_update_period_in_ms);

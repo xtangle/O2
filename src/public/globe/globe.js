@@ -1,5 +1,5 @@
 // globe.js
-// Dependencies: jquery, lodash, d3, d3.topojson, d3.queue, jquery.tablesorter, cashBalanceController.js
+// Dependencies: jquery, lodash, d3, d3.topojson, d3.queue, moment, jquery.tablesorter, cashBalanceController.js
 
 // ================================================================
 // Parameter definitions
@@ -27,11 +27,6 @@ var hasDragged = false;
 // ================================================================
 // Globe setup
 
-// Set base currency header in cash balance table
-const cashBalanceTable = $('#cash-balance-table');
-cashBalanceTable.find('.base-currency-header')
-  .text('Cash Balance (' + cashBalCtrl.getBaseCurrencyCode() + ')');
-
 // Setting projection
 var projection = d3.geo.orthographic()
   .scale(scale_0)
@@ -55,6 +50,27 @@ svg.append('path')
 
 var countryTooltip = d3.select('body').append('div').attr('class', 'countryTooltip');
 
+// ================================================================
+// Initializing the DOM
+
+// Set base currency header in cash balance table
+const cashBalanceTable = $('#cash-balance-table');
+cashBalanceTable.find('.base-currency-header')
+  .text('Cash Balance (' + cashBalCtrl.getBaseCurrencyCode() + ')');
+
+// Initialize animate checkbox
+var animateCheckbox = $('#animate');
+animateCheckbox.prop('checked', animate);
+animateCheckbox.on('click', function () {
+  animate ? stopAnimation() : startAnimation();
+});
+
+// Update conversion rate timestamp label, need to do this before calling cashBalCtrl.init
+cashBalCtrl.onGetConversionRates(function (updateTime) {
+  var momentTime = moment(updateTime);
+  $('#conversion-rate-timestamp').text(momentTime.format('LL LTS'));
+});
+
 queue()
   .defer(d3.json, 'globe/world-110m-withlakes.json')
   .defer(cashBalCtrl.init)
@@ -66,19 +82,6 @@ function ready(error, world) {
   if (error) {
     throw error;
   }
-
-  // ================================================================
-  // Initializing the DOM and registering cash balance controller events
-
-  var animateCheckbox = $('#animate');
-  animateCheckbox.prop('checked', animate);
-  animateCheckbox.on('click', function () {
-    if (animate) {
-      stopAnimation();
-    } else {
-      startAnimation();
-    }
-  });
 
   // Update transaction table when a new transaction is received
   cashBalCtrl.onNewTransaction(function (transaction) {
@@ -128,15 +131,12 @@ function ready(error, world) {
 
   // Register mouse events when on land
   svg.selectAll('path.land')
-    .on('mouseover', function (d) {
-      countryTooltip
-        .style('left', (d3.event.pageX + 7) + 'px')
-        .style('top', (d3.event.pageY - 15) + 'px')
-    })
     .on('mouseenter', function (d) {
       hoveredId = d.id;
       updateTooltipText();
-      countryTooltip.style('display', 'block')
+      countryTooltip.style('left', (d3.event.pageX + 7) + 'px')
+        .style('top', (d3.event.pageY - 15) + 'px')
+        .style('display', 'block')
         .style('opacity', 1);
     })
     .on('mouseout', function (d) {
@@ -197,16 +197,16 @@ function ready(error, world) {
   }
 
   // ================================================================
-  // Common globe functions
+// Common globe functions
 
-  // Redraw paths on the globe
+// Redraw paths on the globe
   function refresh() {
     svg.selectAll('path.land').attr('d', path);
     svg.selectAll('path.water').attr('d', path);
     svg.selectAll('path.lake').attr('d', path);
   }
 
-  // Update tooltip text
+// Update tooltip text
   function updateTooltipText() {
     if (!_.isNil(hoveredId)) {
       var currencyName = cashBalCtrl.getCurrencyNames()[hoveredId];
@@ -269,7 +269,7 @@ function ready(error, world) {
     }, 10);
   }
 
-  // Start/stop animating the rotation of the globe
+// Start/stop animating the rotation of the globe
   function startAnimation() {
     animate = true;
     d3.timer(function () {
@@ -285,15 +285,15 @@ function ready(error, world) {
     refresh();
   }
 
-  // Open transaction summary page for given currency id
+// Open transaction summary page for given currency id
   function openTransactionSummaryPage(id) {
     var currencyCode = cashBalCtrl.getCurrencyCodes()[id];
     var url = base_url + 'transactions?curr=' + currencyCode;
     window.open(url);
   }
 
-  // ================================================================
-  // Helper functions
+// ================================================================
+// Helper functions
 
   function cashBalanceToColor(cashBalance) {
     var r, g, b, f;
@@ -339,4 +339,5 @@ function ready(error, world) {
     }
     return amountString;
   }
+
 }
