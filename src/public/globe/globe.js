@@ -58,13 +58,6 @@ const cashBalanceTable = $('#cash-balance-table');
 cashBalanceTable.find('.base-currency-header')
   .text('Cash Balance (' + cashBalCtrl.getBaseCurrencyCode() + ')');
 
-// Initialize animate checkbox
-var animateCheckbox = $('#animate');
-animateCheckbox.prop('checked', animate);
-animateCheckbox.on('click', function () {
-  animate ? stopAnimation() : startAnimation();
-});
-
 // Update conversion rate timestamp label, need to do this before calling cashBalCtrl.init
 cashBalCtrl.onGetConversionRates(function (updateTime) {
   var momentTime = moment(updateTime);
@@ -82,6 +75,13 @@ function ready(error, world) {
   if (error) {
     throw error;
   }
+
+  // Initialize the animate checkbox
+  var animateCheckbox = $('#animate');
+  animateCheckbox.prop('checked', animate);
+  animateCheckbox.on('click', function () {
+    animate ? stopAnimation() : startAnimation();
+  });
 
   // Update transaction table when a new transaction is received
   cashBalCtrl.onNewTransaction(function (transaction) {
