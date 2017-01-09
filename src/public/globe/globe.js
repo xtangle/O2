@@ -64,6 +64,8 @@ cashBalCtrl.onGetConversionRates(function (updateTime) {
   $('#conversion-rate-timestamp').text(momentTime.format('LL LTS'));
 });
 
+$('#conversion-rate-source').attr('href', cashBalCtrl.getConversionRateSource());
+
 queue()
   .defer(d3.json, 'globe/world-110m-withlakes.json')
   .defer(cashBalCtrl.init)

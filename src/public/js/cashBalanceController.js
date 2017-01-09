@@ -8,6 +8,7 @@ var cashBalCtrl = (function () {
   const base_currency_symbol = '€';
   const country_currency_data_file = 'globe/world-110m-country-currency-data.tsv';
   const conversion_rate_resource_url = '//api.fixer.io/latest?base=' + base_currency_code;
+  const conversion_rate_source = 'http://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html';
   const conversion_rate_update_period_in_ms = 60000;
 
   var cashBalances = {};
@@ -79,6 +80,9 @@ var cashBalCtrl = (function () {
     },
     getBaseCurrencySymbol: function () {
       return base_currency_symbol;
+    },
+    getConversionRateSource: function () {
+      return conversion_rate_source;
     },
     hasCashBalance: function (i) {
       return !_.isNil(cashBalances[i]);
