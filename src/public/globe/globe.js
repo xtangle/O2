@@ -4,8 +4,6 @@
 // ================================================================
 // Parameter definitions
 
-const base_url = location.protocol + '//' + location.hostname + (location.port && ':' + location.port) + '/';
-
 // Globe parameters
 const width = 600, height = 600;
 const sens_0 = 0.25, sens_adjust = 0.2;
@@ -247,7 +245,7 @@ function ready(error, world) {
           .text(cashBalanceInBaseCurrency));
       cashBalanceTable.find('tbody').append(currencyRow);
       cashBalanceTable.on('click', 'tr.' + rowClass, function () {
-        openTransactionSummaryPage(id);
+        openTransactionSummaryPage(currencyCode);
       });
     }
 
@@ -270,6 +268,10 @@ function ready(error, world) {
       var sorting = cashBalanceTable.get(0).config.sortList;
       cashBalanceTable.trigger('sorton', [sorting]);
     }, 10);
+
+    // Update the total row
+    var totalBalance = cashBalCtrl.getTotalCashBalance();
+    cashBalanceTable.find('tfoot .cash-balance-total').text(Math.round(totalBalance).toLocaleString());
   }
 
 // Start/stop animating the rotation of the globe
@@ -289,8 +291,9 @@ function ready(error, world) {
   }
 
 // Open transaction summary page for given currency id
-  function openTransactionSummaryPage(id) {
-    var currencyCode = cashBalCtrl.getCurrencyCodes()[id];
+  function openTransactionSummaryPage(currencyCode) {
+    const base_url = location.protocol + '//' + location.hostname +
+      (location.port && ':' + location.port) + '/';
     var url = base_url + 'transactions?curr=' + currencyCode;
     window.open(url);
   }

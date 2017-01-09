@@ -106,6 +106,21 @@ var cashBalCtrl = (function () {
       return cashBalString;
     },
 
+    getTotalCashBalance: function () {
+      return _.sum(_.uniq(_.values(currencyCodes))
+        .map(function (cur) {
+          return controller.getCashBalanceForCurrency(cur, {inBaseCurrency: true});
+        }));
+    },
+
+    getCashBalanceForCurrency: function (currencyCode, options) {
+      var id = _.findKey(currencyCodes, function(cur) {return cur === currencyCode;});
+      if (_.isNil(id)) {
+        return null;
+      }
+      return _.get(options, 'inBaseCurrency') ? cashBalancesInBaseCurrency[id] : cashBalances[id];
+    },
+
     updateBalances: function (transaction) {
       var ids = indicesOf(currencyCodes, transaction.settlementCurrency);
       ids.forEach(function (i) {
