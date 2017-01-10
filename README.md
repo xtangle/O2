@@ -1,4 +1,4 @@
-# Cash Balance Tracker
+# Cash Counter
 Repository for team O2's entry in the January 2017 RBC Hackathon.
 
 A demo of the app running on the Bluemix environment can be found here: 
